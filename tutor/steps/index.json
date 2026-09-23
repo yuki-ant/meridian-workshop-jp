@@ -112,7 +112,7 @@
       "minutes": 6,
       "title": "受注 · 環境を確認し、/start でアプリを起動",
       "where": "cli",
-      "hint": "/start は自分で入力します。起動したら http://localhost:3000 の概要ページで、期間や場所を切り替えて何が変わらないかを確かめてみましょう。",
+      "hint": "/start は自分で入力します。起動したら http://localhost:3000 の概要ページで、期間や場所を切り替えて何が変わらないかを確かめてみましょう（RFP の R1）。",
       "checks": [
         [
           "env"
@@ -137,9 +137,9 @@
       "id": "07-plan-r1",
       "part": "p2",
       "minutes": 6,
-      "title": "原因を調べて計画する · 「概要ページで期間や場所を選んでも反映されない」",
+      "title": "R1 の原因を調べて計画する · 概要ページで期間や場所を選んでも反映されない",
       "where": "cli",
-      "hint": "Shift+Tab で Plan Mode に切り替えてから、クライアントの報告を Claude に渡します。原因と、直す範囲を確認します。",
+      "hint": "Shift+Tab で Plan Mode に切り替えてから、RFP の R1 を Claude に渡します。原因と、直す範囲を確認します。",
       "checks": [
         [
           "onFeatureBranch"
@@ -159,7 +159,7 @@
       "id": "08-build-r1",
       "part": "p2",
       "minutes": 22,
-      "title": "直す · 概要ページの KPI をフィルターに連動させる",
+      "title": "R1 を直す · 概要ページの KPI をフィルターに連動させる",
       "where": "cli",
       "hint": "直ったら、期間や場所を切り替えて、上部の KPI が変わるかをブラウザで確かめます。",
       "checks": [
