@@ -371,7 +371,7 @@ function stepScript(st) {
   const page = st.page
     ? `\nこのステップのページ: http://localhost:${PORT}/${st.page}   (ファイル: ${path.join(PLUGIN, "pages", st.page)})`
     : "";
-  return `${head}${page}\n\n${body.trim()}\n\n学習者が「できました」と言ったら \`${SELF} next\` を実行してください。完了条件を確認し、次のステップの台本を出力します。`;
+  return `${head}${page}\n\n${body.trim()}\n\n学習者が完了を伝えたら（「できました」「Done」「Next Step」など） \`${SELF} next\` を実行してください。完了条件を確認し、次のステップの台本を出力します。`;
 }
 function closingScript() {
   const body = fs
@@ -840,7 +840,7 @@ switch (cmd) {
     const res = await runChecks(current(s));
     if (!res.length)
       console.log(
-        "（このステップには自動確認がありません。学習者の「できました」で十分です）",
+        "（このステップには自動確認がありません。学習者の完了の合図（「Done」「Next Step」など）で十分です）",
       );
     for (const r of res) console.log(`${r.ok ? "PASS" : "FAIL"}  ${r.msg}`);
     log("check", { step: s.step, ok: res.every((r) => r.ok) });
