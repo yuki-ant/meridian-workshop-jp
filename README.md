@@ -1,35 +1,52 @@
 # Meridian ワークショップ
 
-コンサルタントになったつもりで RFP に応札し、受注した案件を納品まで仕上げる。その一連の流れを通して Claude Code を学ぶワークショップです。
+コンサルタントになったつもりで RFP に応札し、受注した案件の最初の改修を納品する。その流れを通して Claude Code を学ぶ、自習型のワークショップです。所要時間は **約90分** です。
+
+| 幕    | 内容                                                                                       | 目安   |
+| ----- | ------------------------------------------------------------------------------------------ | ------ |
+| 第1幕 | RFP を読み解き、提案書（4セクション）とデッキを作る                                        | 約42分 |
+| 第2幕 | 受注後、アプリを起動し、Reports ページの不具合（R1）のうち最も効く一点を直してコミットする | 約39分 |
 
 ## 事前準備
 
 次のツールをあらかじめインストールしておいてください。
 
-- **Claude Code**:[docs.claude.com/claude-code](https://docs.claude.com/en/docs/claude-code/overview)
-- **Node.js 18 以上**:[nodejs.org](https://nodejs.org)
-- **uv**(Python パッケージマネージャー):`curl -LsSf https://astral.sh/uv/install.sh | sh`
+- **Claude Code**: [docs.claude.com/claude-code](https://docs.claude.com/en/docs/claude-code/overview)
+- **Node.js 18 以上**: [nodejs.org](https://nodejs.org)
+- **uv**（Python パッケージマネージャー）: `curl -LsSf https://astral.sh/uv/install.sh | sh`
 - **git**
 
-## セットアップ
+## 始め方
 
-ワークショップの最後に PR を作成するので、**最初にこのリポジトリを fork** してから、自分の fork をクローンしてください。
+最後に PR を作れるように、**最初にこのリポジトリを fork** してから、自分の fork をクローンしてください。
 
 ```bash
 git clone https://github.com/<your-username>/meridian-workshop-jp.git
 cd meridian-workshop-jp
-claude
+./start.sh          # Windows は start.cmd
 ```
 
-準備はこれで完了です。あとは Claude に一声かければ、続きは Claude が案内してくれます。
+Claude が起動したら「こんにちは」と一声かけてください。あとは Claude が一歩ずつ案内します。最初に、ブラウザで **「いまどこ？」ページ**（http://localhost:8766/map.html）が開きます。現在のステップ、経過時間と90分の予算、全体マップが自動で更新されるので、開いたままにしておいてください。
+
+`./start.sh` は Claude Code に tutor プラグインを `--plugin-dir` で渡すだけで、何もインストールしません。
 
 ## 途中で接続が切れてしまったら
 
-同じディレクトリでもう一度 `claude` を実行し、どこまで進んでいたかを Claude に伝えてください。そこから再開できます。
+もう一度 `./start.sh` を実行してください。進捗は `tutor/state/` に保存されているので、続きから再開できます。
+
+## やり直すとき
+
+```bash
+./reset-demo.sh
+```
+
+進捗を消し、リポジトリを出発点（タグ `tutor-base`）に戻します。それまでの作業は `tutor-backup-<日時>` ブランチに残ります。
 
 ## リポジトリの構成
 
-- `docs/rfp/`:RFP とクライアントの背景資料
-- `proposal/`:提案書の置き場所(最初は空です)
-- `client/`、`server/`:第2幕で手を入れるアプリケーション本体
-- `.claude/`:前任ベンダーが残したプロジェクトレベルの Claude Code 設定(エージェント、コマンド、スキル)
+- `docs/rfp/`: RFP とクライアントの背景資料
+- `proposal/`: 提案書の置き場所（最初は空です）
+- `client/`、`server/`: 第2幕で手を入れるアプリケーション本体
+- `tutor/`: ワークショップのチューター（Claude Code プラグイン。ステップの台本、解説ページ、「いまどこ？」ページ）
+- `.claude/`: 前任ベンダーが残したプロジェクトレベルの Claude Code 設定（エージェント、コマンド、スキル）
+- `instruction/`: 講師用資料

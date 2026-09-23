@@ -1,0 +1,155 @@
+{
+  "title": "Meridian ワークショップ — RFP への応札から最初の納品まで",
+  "budgetMinutes": 90,
+  "parts": [
+    {
+      "id": "p1",
+      "title": "第1幕 · RFP に応札する（提案書づくり）",
+      "minutes": 42
+    },
+    {
+      "id": "p2",
+      "title": "第2幕 · 受注した案件を遂行する（R1 の最初の改修）",
+      "minutes": 39
+    }
+  ],
+  "steps": [
+    {
+      "id": "00-welcome",
+      "part": "p1",
+      "minutes": 3,
+      "title": "ようこそ · 環境の確認と「いまどこ？」",
+      "where": "cli",
+      "page": "map.html",
+      "hint": "このタブは開いたままにしてください。ターミナルに戻り、Claude の案内に沿って進めます。",
+      "checks": [["env"], ["repoReady"]]
+    },
+    {
+      "id": "01-kickoff",
+      "part": "p1",
+      "minutes": 3,
+      "title": "キックオフ · RFP を @ で読み込む",
+      "where": "cli",
+      "hint": "ターミナルで @docs/rfp/MC-2026-0417.md を自分で入力して、Claude に RFP を読ませます。",
+      "checks": [["noteSet", "kickoff"]]
+    },
+    {
+      "id": "02-page-rfp",
+      "part": "p1",
+      "minutes": 5,
+      "title": "読む: RFP の流れと、応札側が考えること",
+      "where": "browser",
+      "page": "01-rfp-process.html",
+      "hint": "解説ページを読み終えたら、ターミナルに戻って「読みました」と伝えてください。",
+      "checks": []
+    },
+    {
+      "id": "03-analyze",
+      "part": "p1",
+      "minutes": 8,
+      "title": "要求を読み解く · 必須と希望、穴、背景資料",
+      "where": "cli",
+      "hint": "RFP の「穴」（曖昧な点）を一つ以上、自分の言葉で挙げてみてください。",
+      "checks": [["noteSet", "gaps"]]
+    },
+    {
+      "id": "04-questions",
+      "part": "p1",
+      "minutes": 5,
+      "title": "確認事項 · クライアント役として答える",
+      "where": "cli",
+      "hint": "選択肢が出たら、クライアントになったつもりで答えます。その答えが提案書の前提条件になります。",
+      "checks": [["noteSet", "assumptions"]]
+    },
+    {
+      "id": "05-proposal",
+      "part": "p1",
+      "minutes": 12,
+      "title": "提案書を書く · 4セクションを1つずつ",
+      "where": "cli",
+      "hint": "技術アプローチの前に Shift+Tab で Plan Mode に。各セクションのあと、直したい点を1つは伝えましょう。",
+      "checks": [
+        ["globExists", "proposal", ".md", 4],
+        ["noteSet", "edit"]
+      ]
+    },
+    {
+      "id": "06-deck",
+      "part": "p1",
+      "minutes": 6,
+      "title": "デッキを作る · HTML スライドと1回の修正",
+      "where": "cli",
+      "hint": "デッキをブラウザで開き、変えたいところ（順番・色・枚数など）を1つ伝えてください。",
+      "checks": [
+        ["fileExists", "proposal/capabilities-deck.html"],
+        ["noteSet", "deck_revision"]
+      ]
+    },
+    {
+      "id": "07-env",
+      "part": "p2",
+      "minutes": 6,
+      "title": "受注 · 環境を確認し、/start でアプリを起動",
+      "where": "cli",
+      "hint": "/start は自分で入力します。起動したら http://localhost:3000 を開き、Reports ページを見てみましょう。",
+      "checks": [
+        ["env"],
+        ["portOpen", 8001, "バックエンド"],
+        ["portOpen", 3000, "フロントエンド"],
+        ["noteSet", "reports_issue"]
+      ]
+    },
+    {
+      "id": "08-plan-r1",
+      "part": "p2",
+      "minutes": 8,
+      "title": "R1 の範囲を絞る · ブランチと Plan Mode",
+      "where": "cli",
+      "hint": "Shift+Tab で Plan Mode に切り替えてから、Claude の計画を読みます。範囲は「フィルターが効く」まで。",
+      "checks": [
+        ["onFeatureBranch"],
+        ["treeClean", "client", "server"],
+        ["noteSet", "r1_scope"]
+      ]
+    },
+    {
+      "id": "09-build-r1",
+      "part": "p2",
+      "minutes": 20,
+      "title": "R1 を実装する · フィルターを Reports につなぐ",
+      "where": "cli",
+      "hint": "実装が終わったら、ブラウザで倉庫やカテゴリのフィルターを変えて Reports の数字が変わるか確かめます。",
+      "checks": [
+        [
+          "fileContains",
+          "client/src/views/Reports.vue",
+          "useFilters",
+          "useFilters の利用"
+        ],
+        [
+          "fileContains",
+          "client/src/views/Reports.vue",
+          "watch(Effect)?\\s*\\(",
+          "フィルター変更の watch"
+        ],
+        [
+          "fileContains",
+          "client/src/api.js",
+          "reports/(quarterly|monthly-trends)",
+          "api.js への reports エンドポイント登録"
+        ],
+        ["commitTouches", "client/src/views/Reports.vue"],
+        ["treeClean", "client", "server"]
+      ]
+    },
+    {
+      "id": "10-wrap",
+      "part": "p2",
+      "minutes": 5,
+      "title": "まとめ · 進捗報告と次フェーズへの引き継ぎ",
+      "where": "cli",
+      "hint": "今回の成果と、残りの R1〜R4 を「次フェーズ」として引き継ぎメモにまとめます。",
+      "checks": [["fileExists", "proposal/next-phase.md"]]
+    }
+  ]
+}
