@@ -30,9 +30,8 @@ function Slide_Title() {
   return (
     <Slide bg={C.SLATE} color={C.IVORY} label="Title" padding="0 112px">
       <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', height: '100%' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 30 }}>
-          <span style={{ width: 44, height: 4, background: C.CLAY, display: 'inline-block', borderRadius: 2 }} />
-          <span style={{ font: `600 13px/1 ${MONO}`, letterSpacing: '0.16em', color: C.CLAY, border: `1.5px solid ${C.CLAY}`, borderRadius: 999, padding: '7px 14px' }}>パートナー向け</span>
+        <div style={{ display: 'flex', alignItems: 'center', marginBottom: 30 }}>
+          <span style={{ font: `600 14px/1 ${MONO}`, letterSpacing: '0.08em', color: C.CLAY, border: `1.5px solid ${C.CLAY}`, borderRadius: 999, padding: '8px 16px' }}>Japan Basecamp for Partner</span>
         </div>
         <div style={{ fontSize: 68, lineHeight: 1.12, fontWeight: 700, letterSpacing: '-0.015em', whiteSpace: 'nowrap' }}>Claude が Claude を教える</div>
         <div style={{ fontSize: 33, fontWeight: 500, color: C.CLAY, marginTop: 16 }}>セルフペース型 Claude ハンズオンワークショップ</div>
@@ -619,7 +618,6 @@ function Slide_Start() {
 function Slide_Thanks() {
   return (
     <Slide bg={C.SLATE} color={C.IVORY} label="Thanks" center>
-      <span style={{ width: 44, height: 4, background: C.CLAY, display: 'inline-block', borderRadius: 2, marginBottom: 30 }} />
       <h1 style={{ fontSize: 54, fontWeight: 700, letterSpacing: '-0.01em', margin: '0 0 16px' }}>ありがとうございました</h1>
       <div style={{ fontSize: 24, fontWeight: 500, color: C.CLAY, textAlign: 'center' }}>ここからは、Claude が案内します。</div>
     </Slide>
@@ -627,7 +625,7 @@ function Slide_Thanks() {
 }
 
 const SLIDES = [
-  { c: Slide_Title, title: 'Claude が Claude を教える', notes: 'パートナー向けの、セルフペース型の Claude ハンズオンワークショップです。進めるのは講師ではなく、Claude Code 自身です。あなたのターミナルの中で、約 90 分かけて 1 ステップずつ案内します。題材は、Meridian Components という架空のクライアントの RFP です。第1幕でコンサルタントとして応札し、受注した第2幕で、最初の改修を納品します。' },
+  { c: Slide_Title, title: 'Claude が Claude を教える', notes: 'Japan Basecamp for Partner の、セルフペース型の Claude ハンズオンワークショップです。進めるのは講師ではなく、Claude Code 自身です。あなたのターミナルの中で、約 90 分かけて 1 ステップずつ案内します。題材は、Meridian Components という架空のクライアントの RFP です。第1幕でコンサルタントとして応札し、受注した第2幕で、最初の改修を納品します。' },
   SHOW_SPEAKER && window.PRESENTER && window.PRESENTER.name && { c: Slide_Speaker, title: '講師紹介', notes: '自己紹介です。名前と所属、これまでの経歴を、30 秒ほどで話します。' },
   { c: Slide_How, title: 'Claude が 1 ステップずつ案内し、あなたが判断して手を動かす', notes: '進み方は、いつも同じです。Claude が次にやることと目安の時間を伝えます。短いページを読むこともあります。読み終えたり、作業が終わったりしたら、ターミナルに戻って「Done」と送ります。「できました」でも構いません。スラッシュコマンド、Shift+Tab、@ によるファイル参照、許可の確認は、あなたにしか入力できないので、Claude は何を入力するかを伝えて待ちます。そのあと Claude が、リポジトリの状態と記録を見て、そのステップの完了条件が満たされているかを確かめます。読むだけのステップは、「Done」でそのまま進みます。[ターミナル、ページ、緑の囲みの順に指す]' },
   { c: Slide_Case, title: 'あなたはコンサルタント。Meridian Components から RFP が届いた', notes: 'あなたの役は、RFP に応札するコンサルタントです。クライアントは Meridian Components。産業用オートメーション部品のディストリビューターで、倉庫はサンフランシスコ、ロンドン、東京にあります。依頼は、在庫管理ダッシュボードのモダナイズと機能拡張です。必須項目は R1 から R5 までで、優先順位順に並んでいます。最優先の R1 が、今日の第2幕で直すものです。手元には、RFP の本体、自社でまとめた背景メモ、前任ベンダーの引き継ぎメモ、そしてソースコードがあります。エンジニアでなくても進められます。決めるのはあなたで、提案書の文章とコードは Claude が書きます。' },
