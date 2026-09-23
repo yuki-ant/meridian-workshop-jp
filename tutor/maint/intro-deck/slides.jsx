@@ -574,7 +574,7 @@ function Slide_Help() {
 /* ── Getting started, and back to the terminal ─────────────────────────────── */
 function Slide_Start() {
   const need = (t, s) => (
-    <div style={{ display: 'flex', gap: 10, alignItems: 'baseline', padding: '9px 0', borderBottom: `1px solid ${C.LINE}` }}>
+    <div style={{ display: 'flex', gap: 10, alignItems: 'baseline', padding: '7px 0', borderBottom: `1px solid ${C.LINE}` }}>
       <b style={{ fontSize: 17, width: 160, flexShrink: 0 }}>{t}</b><span style={{ fontSize: 14.5, color: C.GRAY, lineHeight: 1.5 }}>{s}</span>
     </div>
   );
@@ -585,7 +585,7 @@ function Slide_Start() {
       {/* The terminal spans the full width so the clone command is never cut off, whatever monospace font the machine has. */}
       <div style={{ background: C.SLATE, borderRadius: 14, padding: '12px 28px', fontFamily: MONO, fontSize: 18, lineHeight: 2, whiteSpace: 'nowrap', color: C.IVORY, boxShadow: '0 10px 30px rgba(0,0,0,0.18)' }}>
         {ln(1, 'git clone https://github.com/yuki-ant/meridian-workshop-jp')}
-        {ln(2, <span>cd meridian-workshop-jp && ./start.sh<span style={{ fontFamily: SANS, fontSize: 14, color: 'rgba(250,249,245,0.5)', marginLeft: 22 }}>Windows では start.cmd</span></span>)}
+        {ln(2, <span>cd meridian-workshop-jp && ./start.sh<span style={{ fontFamily: SANS, fontSize: 14, color: 'rgba(250,249,245,0.5)', marginLeft: 22 }}>Windows：Git Bash なら同じコマンド、PowerShell なら .{'\\'}start.cmd</span></span>)}
         <div style={{ borderTop: '1px solid rgba(250,249,245,0.18)', marginTop: 4 }}>
           <span style={{ color: C.CLAY }}>3</span>&nbsp;&nbsp;<span style={{ color: 'rgba(250,249,245,0.6)' }}>&gt;</span> こんにちは<span style={{ fontFamily: SANS, fontSize: 14, color: 'rgba(250,249,245,0.5)', marginLeft: 22 }}>Claude が起動したら、こう話しかけます</span>
         </div>
@@ -606,7 +606,7 @@ function Slide_Start() {
           {need('Node.js 18 以上', 'チューターとフロントエンドが使用')}
           {need('uv', '第2幕でバックエンドが使用。なければ Claude が案内')}
           {need('Python 3.11 以上', '第2幕でバックエンドが使用')}
-          {need('git', 'リポジトリを clone し、作業をコミット')}
+          {need('git', 'clone とコミットに使用。Windows は Git for Windows を推奨')}
           {need('ブラウザ', '「いまどこ？」ページと、読むページを表示')}
         </div>
       </div>
