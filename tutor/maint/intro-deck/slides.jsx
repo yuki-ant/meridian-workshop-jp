@@ -1,4 +1,4 @@
-/* slides.jsx — the pages of the introduction deck: ten, plus a speaker page when the deck is opened with ?present and
+/* slides.jsx — the pages of the introduction deck: eleven, ending on a thank-you page, plus a speaker page when the deck is opened with ?present and
    presenter.js names a presenter. Layout is sized off the 1280×720 canvas with flex and %, never a literal canvas width.
    Copy stays short: what a presenter would say lives in each slide's `notes`.
    The deck must not give away what the learner is meant to find out (the gaps in the RFP, how thin the hand-off memo is,
@@ -557,46 +557,57 @@ function Slide_Help() {
 /* ── Getting started, and back to the terminal ─────────────────────────────── */
 function Slide_Start() {
   const need = (t, s) => (
-    <div style={{ display: 'flex', gap: 10, alignItems: 'baseline', padding: '13px 0', borderBottom: `1px solid ${C.LINE}` }}>
-      <b style={{ fontSize: 18, width: 164, flexShrink: 0 }}>{t}</b><span style={{ fontSize: 15.5, color: C.GRAY, lineHeight: 1.5 }}>{s}</span>
+    <div style={{ display: 'flex', gap: 10, alignItems: 'baseline', padding: '9px 0', borderBottom: `1px solid ${C.LINE}` }}>
+      <b style={{ fontSize: 17, width: 160, flexShrink: 0 }}>{t}</b><span style={{ fontSize: 14.5, color: C.GRAY, lineHeight: 1.5 }}>{s}</span>
     </div>
   );
   const ln = (n, body) => <div><span style={{ color: C.CLAY }}>{n}</span>&nbsp;&nbsp;{body}</div>;
   return (
     <Slide label="Start" padding="40px 72px 58px">
-      <Head kicker="始め方" h2={ph('fork して clone し、', 'コマンドを 1 つ実行する')} />
-      <div style={{ display: 'flex', gap: 36, flex: 1, minHeight: 0, alignItems: 'stretch' }}>
-        <div style={{ flex: 1.12, display: 'flex', flexDirection: 'column', gap: 14, minWidth: 0 }}>
-          <div style={{ background: C.SLATE, borderRadius: 14, padding: '16px 26px', fontFamily: MONO, fontSize: 17, lineHeight: 2.2, whiteSpace: 'nowrap', overflow: 'hidden', color: C.IVORY, boxShadow: '0 10px 30px rgba(0,0,0,0.18)' }}>
-            {ln(1, <span style={{ color: 'rgba(250,249,245,0.55)' }}># GitHub でこのリポジトリを fork してから</span>)}
-            {ln(2, <span>git clone https://github.com/<span style={{ color: '#E8A48C' }}>&lt;あなた&gt;</span>/meridian-workshop-jp.git</span>)}
-            {ln(3, 'cd meridian-workshop-jp && ./start.sh')}
-            <div style={{ borderTop: '1px solid rgba(250,249,245,0.18)', marginTop: 6, paddingTop: 2 }}>
-              <span style={{ fontFamily: SANS, fontSize: 13, color: 'rgba(250,249,245,0.55)', marginRight: 12 }}>Claude が起動したら</span><span style={{ color: 'rgba(250,249,245,0.6)' }}>&gt;</span> こんにちは
-            </div>
+      <Head kicker="始め方" h2={ph('リポジトリを clone して、', 'コマンドを 1 つ実行する')} />
+      {/* The terminal spans the full width so the clone command is never cut off, whatever monospace font the machine has. */}
+      <div style={{ background: C.SLATE, borderRadius: 14, padding: '12px 28px', fontFamily: MONO, fontSize: 18, lineHeight: 2, whiteSpace: 'nowrap', color: C.IVORY, boxShadow: '0 10px 30px rgba(0,0,0,0.18)' }}>
+        {ln(1, 'git clone https://github.com/yuki-ant/meridian-workshop-jp')}
+        {ln(2, <span>cd meridian-workshop-jp && ./start.sh<span style={{ fontFamily: SANS, fontSize: 14, color: 'rgba(250,249,245,0.5)', marginLeft: 22 }}>Windows では start.cmd</span></span>)}
+        <div style={{ borderTop: '1px solid rgba(250,249,245,0.18)', marginTop: 4 }}>
+          <span style={{ color: C.CLAY }}>3</span>&nbsp;&nbsp;<span style={{ color: 'rgba(250,249,245,0.6)' }}>&gt;</span> こんにちは<span style={{ fontFamily: SANS, fontSize: 14, color: 'rgba(250,249,245,0.5)', marginLeft: 22 }}>Claude が起動したら、こう話しかけます</span>
+        </div>
+      </div>
+      <div style={{ display: 'flex', gap: 36, flex: 1, minHeight: 0, alignItems: 'stretch', marginTop: 14 }}>
+        <div style={{ flex: 1.12, display: 'flex', flexDirection: 'column', gap: 12, minWidth: 0 }}>
+          <div style={{ fontSize: 15, color: C.GRAY, lineHeight: 1.75 }}>
+            {code('start.sh', 14)} は、チューターのプラグインをこのセッションにだけ読み込んで {code('claude', 14)} を起動します。最後に Pull Request を作りたい方は、先に GitHub で fork して、自分の fork を clone してください。
           </div>
-          <div style={{ fontSize: 16, color: C.GRAY, lineHeight: 1.8 }}>
-            {code('start.sh', 14.5)} は、チューターのプラグインをこのセッションにだけ読み込んで {code('claude', 14)} を起動します。Windows では {code('start.cmd', 14)}。fork しておくと、最後に Pull Request を作れます。
-          </div>
-          <div style={{ background: '#fff', border: `1.5px solid ${C.CLAY}`, borderRadius: 12, padding: '16px 22px' }}>
-            <div style={{ fontSize: 23, fontWeight: 700, marginBottom: 4 }}>あなたの Claude Code には、何も追加されません。</div>
-            <div style={{ fontSize: 15.5, color: C.INK, lineHeight: 1.7 }}>チューター（Claude を案内役にするプラグイン）が働くのは、このセッションだけです。ほかの場所で {code('claude', 13.5)} を起動したときの動きは変わりません。</div>
+          <div style={{ background: '#fff', border: `1.5px solid ${C.CLAY}`, borderRadius: 12, padding: '13px 20px' }}>
+            <div style={{ fontSize: 21, fontWeight: 700, marginBottom: 3 }}>あなたの Claude Code には、何も追加されません。</div>
+            <div style={{ fontSize: 14.5, color: C.INK, lineHeight: 1.65 }}>チューター（Claude を案内役にするプラグイン）が働くのは、このセッションだけです。ほかの場所で {code('claude', 13.5)} を起動したときの動きは変わりません。</div>
           </div>
         </div>
         <div style={{ flex: 0.88, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
-          <div style={{ font: `600 12px/1.4 ${MONO}`, letterSpacing: '0.12em', color: C.GRAY, marginBottom: 2 }}>必要なもの</div>
+          <div style={{ font: `600 12px/1.4 ${MONO}`, letterSpacing: '0.12em', color: C.GRAY }}>必要なもの</div>
           {need('Claude Code', 'インストール済み、サインイン済み')}
           {need('Node.js 18 以上', 'チューターとフロントエンドが使用')}
           {need('uv', '第2幕でバックエンドが使用。なければ Claude が案内')}
           {need('Python 3.11 以上', '第2幕でバックエンドが使用')}
-          {need('git', 'fork を clone し、作業をコミット')}
+          {need('git', 'リポジトリを clone し、作業をコミット')}
           {need('ブラウザ', '「いまどこ？」ページと、読むページを表示')}
         </div>
       </div>
-      <div style={{ marginTop: 14, background: C.CLAY, color: '#fff', borderRadius: 12, padding: '13px 22px', display: 'flex', alignItems: 'center', gap: 18, boxShadow: '0 6px 24px rgba(0,0,0,0.15)' }}>
-        <span style={{ fontSize: 21, fontWeight: 700, whiteSpace: 'nowrap' }}>では、ターミナルへ。</span>
-        <span style={{ fontSize: 15.5, lineHeight: 1.6 }}>Claude が待っている方は、戻って <b style={{ fontFamily: MONO }}>Done</b> と送ってください。これから始める方は、上のコマンドを実行してください。</span>
+      <div style={{ marginTop: 12, background: C.CLAY, color: '#fff', borderRadius: 12, padding: '12px 22px', display: 'flex', alignItems: 'center', gap: 18, boxShadow: '0 6px 24px rgba(0,0,0,0.15)' }}>
+        <span style={{ fontSize: 20, fontWeight: 700, whiteSpace: 'nowrap' }}>では、ターミナルへ。</span>
+        <span style={{ fontSize: 15, lineHeight: 1.6 }}>Claude が待っている方は、戻って <b style={{ fontFamily: MONO }}>Done</b> と送ってください。これから始める方は、上のコマンドを実行してください。</span>
       </div>
+    </Slide>
+  );
+}
+
+/* ── Thanks ────────────────────────────────────────────────────────────────── */
+function Slide_Thanks() {
+  return (
+    <Slide bg={C.SLATE} color={C.IVORY} label="Thanks" center>
+      <span style={{ width: 44, height: 4, background: C.CLAY, display: 'inline-block', borderRadius: 2, marginBottom: 30 }} />
+      <h1 style={{ fontSize: 54, fontWeight: 700, letterSpacing: '-0.01em', margin: '0 0 16px' }}>ありがとうございました</h1>
+      <div style={{ fontSize: 24, fontWeight: 500, color: C.CLAY, textAlign: 'center' }}>ここからは、Claude が案内します。</div>
     </Slide>
   );
 }
@@ -612,7 +623,8 @@ const SLIDES = [
   { c: Slide_Report, title: '今日の進捗を、レポートに自動でまとめる', notes: '終わったときの様子です。最後のステップで Claude にレポートを頼むと、数字はチューターが実行記録から埋め、文章は Claude が書いて、ブラウザで開きます。コンサルタントがクライアントと自社に渡す進捗レポートの形になっていて、今日の成果、予定と実績のタイムライン、提案書、納品したコミット、コードレビュー、判断と軌道修正、そして次フェーズへの引き継ぎが 1 ページにまとまります。画面は、サンプルのデータで表示した例です。' },
   { c: Slide_Keep, title: '作ったものは、リポジトリのファイルとコミットとして手元に残る', notes: 'ここで作るものは、どれもリポジトリの中の実際のファイルとコミットです。proposal フォルダーには、提案書と、その HTML ページとスライド、そして進捗レポートが入ります。コードの変更は、作業ブランチ fix/overview-filters のコミットとして残ります。概要ページを直したコミットと、レビューの指摘を直したコミットです。最後に、自分の fork に push して Pull Request を作るところまで、Claude が手伝います。' },
   { c: Slide_Help, title: '行き詰まっても、中断しても、続きから再開できる', notes: '行き詰まったら、そのまま Claude に伝えてください。足りないものを一緒に片付けるか、時間がなければ確認のうえで先へ進めます。中断したときは、start.sh をもう一度実行すれば同じステップに戻れます。進捗は tutor/state フォルダーに保存されています。最初からやり直すときは reset-demo.sh です。それまでの作業は退避用のブランチに残ります。' },
-  { c: Slide_Start, title: 'fork して clone し、コマンドを 1 つ実行する', notes: '始め方です。最後に Pull Request を作れるように、最初にリポジトリを fork して、自分の fork を clone します。あとは start.sh を実行して、Claude に「こんにちは」と声をかけるだけです。start.sh は、このセッションにだけチューターのプラグインを読み込んで Claude Code を起動します。あなたの Claude Code には何も追加されません。必要なのは、Claude Code、Node.js 18 以上、uv、Python 3.11 以上、git、ブラウザです。uv と Python は第2幕まで使いません。では、ターミナルに戻りましょう。Claude が待っている方は「Done」と送ってください。これから始める方は、このコマンドを実行してください。' },
+  { c: Slide_Start, title: 'リポジトリを clone して、コマンドを 1 つ実行する', notes: '始め方です。リポジトリを clone して、start.sh を実行し、Claude に「こんにちは」と声をかけるだけです。最後に Pull Request を作りたい方は、先に GitHub で fork して、自分の fork を clone してください。start.sh は、このセッションにだけチューターのプラグインを読み込んで Claude Code を起動します。あなたの Claude Code には何も追加されません。必要なのは、Claude Code、Node.js 18 以上、uv、Python 3.11 以上、git、ブラウザです。uv と Python は第2幕まで使いません。では、ターミナルに戻りましょう。Claude が待っている方は「Done」と送ってください。これから始める方は、このコマンドを実行してください。' },
+  { c: Slide_Thanks, title: 'ありがとうございました', notes: '説明は以上です。ここからは、Claude が 1 ステップずつ案内します。ご質問があればどうぞ。' },
 ].filter(Boolean);
 
 mountDeck(SLIDES);
