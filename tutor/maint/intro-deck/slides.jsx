@@ -39,14 +39,18 @@ function Slide_Title() {
           Meridian Components の RFP に応札し、最初の改修を納品します · {nb('約 90 分')}<br />
           自分のターミナルで、Claude が {nb('1 ステップ')}ずつ案内します。
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 44 }}>
-          <span style={lbl}>第1幕 · 応札</span>
-          <span style={{ display: 'inline-flex', gap: 6 }}>{[0, 1, 2, 3, 4, 5, 6].map((i) => dot(C.SKY, i))}</span>
-          <span style={Object.assign({}, lbl, { color: C.CLAY })}>→ 受注 →</span>
-          <span style={lbl}>第2幕 · 納品</span>
-          <span style={{ display: 'inline-flex', gap: 6 }}>{[0, 1, 2, 3].map((i) => dot(C.CLAY, i))}</span>
-          <span style={{ width: 12, height: 14, borderRadius: 2, border: '2px solid #9CC3B5', display: 'inline-block' }} />
-          <span style={Object.assign({}, lbl, { color: '#9CC3B5' })}>進捗レポート</span>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14, marginTop: 42 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <span style={Object.assign({}, lbl, { width: 104 })}>第1幕 · 応札</span>
+            <span style={{ display: 'inline-flex', gap: 6 }}>{[0, 1, 2, 3, 4, 5, 6].map((i) => dot(C.SKY, i))}</span>
+            <span style={Object.assign({}, lbl, { color: C.CLAY })}>→ 受注</span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <span style={Object.assign({}, lbl, { width: 104 })}>第2幕 · 納品</span>
+            <span style={{ display: 'inline-flex', gap: 6 }}>{[0, 1, 2, 3].map((i) => dot(C.CLAY, i))}</span>
+            <span style={{ width: 12, height: 14, borderRadius: 2, border: '2px solid #9CC3B5', display: 'inline-block' }} />
+            <span style={Object.assign({}, lbl, { color: '#9CC3B5' })}>進捗レポート</span>
+          </div>
         </div>
       </div>
     </Slide>
