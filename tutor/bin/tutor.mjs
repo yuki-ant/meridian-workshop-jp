@@ -31,14 +31,28 @@ const LOG = path.join(STATE_DIR, "log.jsonl");
 // 8766, not the todo-app tutor's 8765, so both tutorials can run on one machine without fighting over the port.
 const BASE_PORT = Number(process.env.TUTOR_PORT || 8766);
 let PORT = BASE_PORT;
-const INDEX = JSON.parse(
-  fs.readFileSync(path.join(PLUGIN, "steps", "index.json"), "utf8"),
-);
-const STEPS = INDEX.steps;
+// The step list. The page server is a long-lived process, so it re-reads index.json whenever the file changes
+// (refreshIndex); otherwise an edited step list would not reach the dashboard until the server restarted.
+const INDEX_FILE = path.join(PLUGIN, "steps", "index.json");
+let INDEX = JSON.parse(fs.readFileSync(INDEX_FILE, "utf8"));
+let STEPS = INDEX.steps;
+let indexMtime = fs.statSync(INDEX_FILE).mtimeMs;
+function refreshIndex() {
+  try {
+    const m = fs.statSync(INDEX_FILE).mtimeMs;
+    if (m === indexMtime) return;
+    INDEX = JSON.parse(fs.readFileSync(INDEX_FILE, "utf8"));
+    STEPS = INDEX.steps;
+    TOTAL_MIN = STEPS.reduce((a, s) => a + (s.minutes || 0), 0);
+    indexMtime = m;
+  } catch {
+    /* half-written or invalid file: keep serving the last good list */
+  }
+}
 const SELF = "node tutor/bin/tutor.mjs";
 const SERVER_NAME = "meridian-tutor";
 const PROPOSAL_DIR = path.join(ROOT, "proposal");
-const TOTAL_MIN = STEPS.reduce((a, s) => a + (s.minutes || 0), 0);
+let TOTAL_MIN = STEPS.reduce((a, s) => a + (s.minutes || 0), 0);
 
 // ── state ────────────────────────────────────────────────────────────────────
 function now() {
@@ -83,6 +97,16 @@ function load() {
       s.seen = [...new Set(s.seen.map(r))];
       s.idsV3 = true;
     }
+    // A code-review step was inserted before the wrap-up
+    if (!s.idsV4) {
+      const r = (id) => (id === "09-wrap" ? "10-wrap" : id);
+      s.step = r(s.step);
+      s.done.forEach((d) => {
+        d.id = r(d.id);
+      });
+      s.seen = s.seen.map(r);
+      s.idsV4 = true;
+    }
     return s;
   } catch {
     return {
@@ -95,6 +119,7 @@ function load() {
       baseBranch: null,
       idsV2: true,
       idsV3: true,
+      idsV4: true,
     };
   }
 }
@@ -109,6 +134,7 @@ const CHEAP = new Set([
   "fileExists",
   "globExists",
   "fileContains",
+  "fileLacks",
   "onFeatureBranch",
   "committedSince",
   "commitTouches",
@@ -287,6 +313,14 @@ const CHECKS = {
       ? { ok: true, msg: `${rel}: ${label || pattern} を確認` }
       : { ok: false, msg: `${rel}: ${label || pattern} がまだ見当たりません` };
   },
+  fileLacks(rel, pattern, label) {
+    const t = read(rel);
+    if (!t) return { ok: false, msg: `${rel} が読めません` };
+    const n = (t.match(new RegExp(pattern, "g")) || []).length;
+    return n === 0
+      ? { ok: true, msg: `${rel}: ${label || pattern} は残っていません` }
+      : { ok: false, msg: `${rel}: ${label || pattern} がまだ ${n} 箇所残っています` };
+  },
   async portOpen(port, label) {
     return (await httpAlive(Number(port)))
       ? { ok: true, msg: `${label || "ポート"} ${port} が応答しています` }
@@ -407,7 +441,8 @@ function stepScript(st) {
   const page = st.page
     ? `\nこのステップのページ: http://localhost:${PORT}/${st.page}   (ファイル: ${path.join(PLUGIN, "pages", st.page)})`
     : "";
-  return `${head}${page}\n\n${body.trim()}\n\n学習者が完了を伝えたら（「できました」「Done」「Next Step」など） \`${SELF} next\` を実行してください。完了条件を確認し、次のステップの台本を出力します。`;
+  const last = stepIndex(st.id) === STEPS.length - 1;
+  return `${head}${page}\n\n${body.trim()}\n\n${last ? `これが最後のステップです。成果物を書き上げて開いたら、学習者の合図を待たずに同じターンで \`${SELF} next\` を実行し、出力された締めの台本に従ってください。` : `学習者が完了を伝えたら（「できました」「Done」「Next Step」など） \`${SELF} next\` を実行してください。完了条件を確認し、次のステップの台本を出力します。`}`;
 }
 function closingScript() {
   const body = fs
@@ -436,7 +471,73 @@ const MIME = {
   ".webp": "image/webp",
   ".md": "text/plain; charset=utf-8",
 };
+// ── Markdown → HTML, for the learner's .md deliverables ─────────────────────────
+// Deliberately small (Node built-ins only): headings, paragraphs, lists, tables, fenced code, quotes, rules,
+// and inline code / bold / italic / links. Everything is HTML-escaped first, so a file can never inject markup.
+const esc = (t) => t.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+function mdInline(t) {
+  const codes = [];
+  let s = esc(t).replace(/`([^`]+)`/g, (_, c) => `\u0000${codes.push(c) - 1}\u0000`);
+  s = s
+    .replace(/\*\*([^*]+)\*\*/g, "<b>$1</b>")
+    .replace(/(^|[^*])\*([^*\s][^*]*)\*/g, "$1<i>$2</i>")
+    .replace(/\[([^\]]+)\]\(((?:https?:\/\/|\.?\/|#)[^)\s]*)\)/g, '<a href="$2">$1</a>');
+  return s.replace(/\u0000(\d+)\u0000/g, (_, i) => `<code>${codes[i]}</code>`);
+}
+function mdToHtml(src) {
+  const lines = src.replace(/\r\n?/g, "\n").split("\n");
+  const out = [];
+  let i = 0;
+  const isTableSep = (l) => /^\s*\|?\s*:?-{2,}:?\s*(\|\s*:?-{2,}:?\s*)*\|?\s*$/.test(l);
+  const cells = (l) => l.trim().replace(/^\||\|$/g, "").split("|").map((c) => mdInline(c.trim()));
+  while (i < lines.length) {
+    const l = lines[i];
+    if (/^\s*```/.test(l)) {
+      const buf = [];
+      for (i++; i < lines.length && !/^\s*```/.test(lines[i]); i++) buf.push(esc(lines[i]));
+      out.push(`<pre>${buf.join("\n")}</pre>`);
+      i++;
+    } else if (/^#{1,6}\s/.test(l)) {
+      const n = l.match(/^#+/)[0].length;
+      out.push(`<h${n}>${mdInline(l.replace(/^#+\s*/, ""))}</h${n}>`);
+      i++;
+    } else if (/^\s*(---|\*\*\*|___)\s*$/.test(l)) {
+      out.push("<hr>");
+      i++;
+    } else if (l.includes("|") && i + 1 < lines.length && isTableSep(lines[i + 1])) {
+      const head = cells(l);
+      const rows = [];
+      for (i += 2; i < lines.length && lines[i].includes("|") && lines[i].trim(); i++) rows.push(cells(lines[i]));
+      out.push(`<table><tr>${head.map((c) => `<th>${c}</th>`).join("")}</tr>${rows.map((r) => `<tr>${r.map((c) => `<td>${c}</td>`).join("")}</tr>`).join("")}</table>`);
+    } else if (/^\s*([-*+]|\d+[.)])\s+/.test(l)) {
+      const ordered = /^\s*\d/.test(l);
+      const items = [];
+      for (; i < lines.length && /^\s*([-*+]|\d+[.)])\s+/.test(lines[i]); i++) items.push(`<li>${mdInline(lines[i].replace(/^\s*([-*+]|\d+[.)])\s+/, ""))}</li>`);
+      out.push(ordered ? `<ol>${items.join("")}</ol>` : `<ul>${items.join("")}</ul>`);
+    } else if (/^\s*>/.test(l)) {
+      const buf = [];
+      for (; i < lines.length && /^\s*>/.test(lines[i]); i++) buf.push(mdInline(lines[i].replace(/^\s*>\s?/, "")));
+      out.push(`<blockquote>${buf.join("<br>")}</blockquote>`);
+    } else if (!l.trim()) {
+      i++;
+    } else {
+      const buf = [];
+      for (; i < lines.length && lines[i].trim() && !/^(#{1,6}\s|\s*```|\s*([-*+]|\d+[.)])\s+|\s*>)/.test(lines[i]) && !(lines[i].includes("|") && i + 1 < lines.length && isTableSep(lines[i + 1])); i++) buf.push(mdInline(lines[i]));
+      out.push(`<p>${buf.join("<br>")}</p>`);
+    }
+  }
+  return out.join("\n");
+}
+function markdownPage(name, src) {
+  return `<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${esc(name)}</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap"><link rel="stylesheet" href="/assets/page.css">
+<style>h3{margin:26px 0 8px}blockquote{border-left:4px solid var(--oat);padding:4px 14px;color:#3d3d3a;margin:12px 0}hr{border:none;border-top:1px solid var(--line);margin:28px 0}</style></head>
+<body><main><div class="kicker">あなたの成果物 · ${esc(name)} · <a href="/map.html" style="color:inherit">いまどこ？へ戻る</a> · <a href="?raw=1" style="color:inherit">元の Markdown</a></div>
+${mdToHtml(src)}</main></body></html>`;
+}
+
 function publicState() {
+  refreshIndex();
   const s = load();
   const cur = stepIndex(s.step);
   const curStep = s.finishedAt ? null : STEPS[cur];
@@ -457,9 +558,9 @@ function publicState() {
       try {
         return fs
           .readdirSync(PROPOSAL_DIR)
-          .filter((f) => f.endsWith(".html"))
+          .filter((f) => f.endsWith(".html") || f.endsWith(".md"))
           .sort()
-          .map((f) => ({ name: f, url: `/proposal/${encodeURIComponent(f)}` }));
+          .map((f) => ({ name: f, kind: f.endsWith(".md") ? "md" : "html", url: `/proposal/${encodeURIComponent(f)}` }));
       } catch {
         return [];
       }
@@ -573,6 +674,10 @@ function serve(port) {
     ) {
       res.writeHead(404);
       return res.end("not found");
+    }
+    if (isProposal && file.endsWith(".md") && !/[?&]raw=1\b/.test(req.url || "")) {
+      res.writeHead(200, { "content-type": MIME[".html"], "cache-control": "no-store" });
+      return res.end(markdownPage(path.basename(file), fs.readFileSync(file, "utf8")));
     }
     res.writeHead(200, {
       "content-type": MIME[path.extname(file)] || "application/octet-stream",

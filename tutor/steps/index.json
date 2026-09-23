@@ -5,12 +5,12 @@
     {
       "id": "p1",
       "title": "第1幕 · RFP に応札する（提案書づくり）",
-      "minutes": 34
+      "minutes": 30
     },
     {
       "id": "p2",
-      "title": "第2幕 · 受注した案件を遂行する（R1 の最初の改修）",
-      "minutes": 39
+      "title": "第2幕 · 受注した案件を遂行する（概要と Reports の改修、コードレビュー）",
+      "minutes": 49
     }
   ],
   "steps": [
@@ -58,7 +58,7 @@
     {
       "id": "03-analyze",
       "part": "p1",
-      "minutes": 8,
+      "minutes": 6,
       "title": "要求を読み解く · 必須と希望、穴、背景資料",
       "where": "cli",
       "hint": "RFP の「穴」（曖昧な点）を一つ以上、自分の言葉で挙げてみてください。",
@@ -72,7 +72,7 @@
     {
       "id": "04-proposal",
       "part": "p1",
-      "minutes": 10,
+      "minutes": 8,
       "title": "提案の方針を決める · 提案書は Claude が一気に書く",
       "where": "cli",
       "hint": "選択肢が出たら、コンサルタントとして提案の方針を4つ選んでください。提案書の作文は Claude が一気にやります。",
@@ -111,7 +111,7 @@
       "minutes": 6,
       "title": "受注 · 環境を確認し、/start でアプリを起動",
       "where": "cli",
-      "hint": "/start は自分で入力します。起動したら http://localhost:3000 を開き、Reports ページを見てみましょう。",
+      "hint": "/start は自分で入力します。起動したら http://localhost:3000 を開き、概要ページと Reports ページで気になるところを探してみましょう。",
       "checks": [
         [
           "env"
@@ -135,10 +135,10 @@
     {
       "id": "07-plan-r1",
       "part": "p2",
-      "minutes": 8,
-      "title": "R1 の範囲を絞る · ブランチと Plan Mode",
+      "minutes": 6,
+      "title": "改修の範囲を決める · ブランチと Plan Mode",
       "where": "cli",
-      "hint": "Shift+Tab で Plan Mode に切り替えてから、Claude の計画を読みます。範囲は「フィルターが効く」まで。",
+      "hint": "Shift+Tab で Plan Mode に切り替えてから、Claude の計画を読みます。範囲は A: 概要ページ と B: Reports のフィルター。",
       "checks": [
         [
           "onFeatureBranch"
@@ -157,11 +157,23 @@
     {
       "id": "08-build-r1",
       "part": "p2",
-      "minutes": 20,
-      "title": "R1 を実装する · フィルターを Reports につなぐ",
+      "minutes": 22,
+      "title": "実装する · A 概要ページ → B Reports のフィルター",
       "where": "cli",
-      "hint": "実装が終わったら、ブラウザで倉庫やカテゴリのフィルターを変えて Reports の数字が変わるか確かめます。",
+      "hint": "A のあとは日本語表示のボタンとタスクの保存、B のあとはフィルターで Reports の数字が変わるかを、ブラウザで確かめます。",
       "checks": [
+        [
+          "fileLacks",
+          "client/src/views/Dashboard.vue",
+          "(Create|View) PO",
+          "英語のままの「Create PO」「View PO」"
+        ],
+        [
+          "fileContains",
+          "server/main.py",
+          "/api/tasks",
+          "/api/tasks の実装"
+        ],
         [
           "fileContains",
           "client/src/views/Reports.vue",
@@ -182,6 +194,10 @@
         ],
         [
           "commitTouches",
+          "client/src/views/Dashboard.vue"
+        ],
+        [
+          "commitTouches",
           "client/src/views/Reports.vue"
         ],
         [
@@ -192,12 +208,31 @@
       ]
     },
     {
-      "id": "09-wrap",
+      "id": "09-review",
+      "part": "p2",
+      "minutes": 10,
+      "title": "コードレビュー · サブエージェントの指摘を選んで直す",
+      "where": "cli",
+      "hint": "レビュー結果から、直す指摘を選びます。直さないものは次フェーズの引き継ぎメモに回します。",
+      "checks": [
+        [
+          "noteSet",
+          "review"
+        ],
+        [
+          "treeClean",
+          "client",
+          "server"
+        ]
+      ]
+    },
+    {
+      "id": "10-wrap",
       "part": "p2",
       "minutes": 5,
       "title": "まとめ · 進捗報告と次フェーズへの引き継ぎ",
       "where": "cli",
-      "hint": "今回の成果と、残りの R1〜R4 を「次フェーズ」として引き継ぎメモにまとめます。",
+      "hint": "引き継ぎメモができたら、「あなたの成果物」から開いてブラウザで読めます。",
       "checks": [
         [
           "fileExists",

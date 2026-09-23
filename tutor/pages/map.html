@@ -304,6 +304,7 @@
             a.target = "_blank";
             const row = el("div", "step");
             row.appendChild(a);
+            row.appendChild(el("span", "m", f.kind === "md" ? "Markdown → 表示用に整形" : "HTML"));
             dv.appendChild(row);
           }
 
