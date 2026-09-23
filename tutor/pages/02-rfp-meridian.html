@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>今回の RFP を読み解く — Meridian MC-2026-0417</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap"
+    />
+    <link rel="stylesheet" href="assets/page.css" />
+    <style>
+      .weights {
+        display: flex;
+        height: 40px;
+        border-radius: 10px;
+        overflow: hidden;
+        margin: 12px 0 8px;
+        font-size: 13px;
+        font-weight: 600;
+        color: #fff;
+      }
+      .weights div {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        white-space: nowrap;
+        overflow: hidden;
+      }
+      .who {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+      }
+      @media (max-width: 720px) {
+        .who {
+          grid-template-columns: 1fr;
+        }
+      }
+      .who .card {
+        margin: 0;
+      }
+      .who .role {
+        font-size: 12px;
+        color: var(--gray);
+        letter-spacing: 0.06em;
+      }
+      .svgwrap {
+        overflow-x: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <div class="kicker">第1幕 · ステップ 02 · 私たちの理解</div>
+      <h1>今回の RFP を読み解く</h1>
+      <p class="lede">
+        Meridian Components の RFP（MC-2026-0417）を、ステップ 01
+        で見た観点で整理したものです。在庫管理ダッシュボードのモダナイズと機能拡張を、前任ベンダーから引き継いで担うベンダーを探しています。
+      </p>
+
+      <h2>1 · スケジュール: いまどこにいるか</h2>
+      <div class="card svgwrap">
+        <svg
+          viewBox="0 0 800 150"
+          width="100%"
+          style="min-width: 640px"
+          role="img"
+          aria-label="今回の RFP の日程: 4月17日発行、4月28日質問締切、提案書作成中、5月8日提出期限、その後評価"
+        >
+          <line
+            x1="50"
+            y1="90"
+            x2="750"
+            y2="90"
+            stroke="#E3DACC"
+            stroke-width="4"
+          />
+          <g font-size="13" text-anchor="middle">
+            <circle cx="50" cy="90" r="14" fill="#D97757" />
+            <text x="50" y="125" fill="#141413" font-weight="700">発行</text>
+            <text x="50" y="55" fill="#a5482b">4/17</text>
+            <circle cx="200" cy="90" r="14" fill="#D97757" />
+            <text x="200" y="125" fill="#141413" font-weight="700">
+              質問期間
+            </text>
+            <text x="200" y="55" fill="#a5482b">〜4/28</text>
+            <circle cx="350" cy="90" r="18" fill="#141413" />
+            <text x="350" y="125" fill="#141413" font-weight="700">
+              提案書作成
+            </text>
+            <text x="350" y="55" fill="#a5482b" font-weight="700">
+              今日ここ
+            </text>
+            <circle cx="500" cy="90" r="14" fill="#D97757" />
+            <text x="500" y="125" fill="#141413" font-weight="700">提出</text>
+            <text x="500" y="55" fill="#a5482b">5/8 17:00（米国中部）</text>
+            <circle cx="650" cy="90" r="14" fill="#6A9BCC" />
+            <text x="650" y="125" fill="#141413" font-weight="700">
+              評価・最終候補
+            </text>
+            <text x="650" y="55" fill="#3d6f9e">
+              スライド10〜15枚の場合あり
+            </text>
+          </g>
+        </svg>
+      </div>
+
+      <h2>2 · 何を求めているか: 必須と希望</h2>
+      <table>
+        <tr>
+          <th>#</th>
+          <th>必須項目（優先順）</th>
+          <th>要点</th>
+        </tr>
+        <tr>
+          <td>R1</td>
+          <td>Reports モジュールの改修</td>
+          <td>既知の欠陥の調査と解消。先方は「少なくとも8件」を記録</td>
+        </tr>
+        <tr>
+          <td>R2</td>
+          <td>発注推奨機能</td>
+          <td>在庫水準・需要予測・予算上限から発注を推奨する新しいビュー</td>
+        </tr>
+        <tr>
+          <td>R3</td>
+          <td>ブラウザテストの自動化</td>
+          <td>主要なフローの E2E テスト。IT が変更を安全に承認できるように</td>
+        </tr>
+        <tr>
+          <td>R4</td>
+          <td>アーキテクチャドキュメント</td>
+          <td>IT への引き継ぎに耐える現状の概要。形式は自由</td>
+        </tr>
+      </table>
+      <table>
+        <tr>
+          <th>#</th>
+          <th>希望項目（評価対象・必須ではない）</th>
+          <th>要点</th>
+        </tr>
+        <tr>
+          <td>D1</td>
+          <td>UI のモダナイズ</td>
+          <td>「現在の標準」に沿ったデザインの刷新</td>
+        </tr>
+        <tr>
+          <td>D2</td>
+          <td>国際化対応</td>
+          <td>東京倉庫のスタッフが英語だけの画面で作業している</td>
+        </tr>
+        <tr>
+          <td>D3</td>
+          <td>ダークモード</td>
+          <td>倉庫フロアの低照度の端末向け</td>
+        </tr>
+      </table>
+      <p class="muted">
+        背景:
+        2024年に前任ベンダーが納品。稼働はしているが一部が未完成で、自動テストがなく、IT
+        が変更の承認に慎重になっている。引き継ぎ資料は限られている。
+      </p>
+
+      <h2>3 · 評価配点</h2>
+      <div class="weights">
+        <div style="width: 40%; background: #d97757">技術アプローチ 40%</div>
+        <div style="width: 25%; background: #6a9bcc">関連実績 25%</div>
+        <div style="width: 20%; background: #629987">スケジュール 20%</div>
+        <div style="width: 15%; background: #788c5d">価格 15%</div>
+      </div>
+      <p>
+        価格は15%しかありません。安さより、<b>要件を正しく理解し、確実に進められる</b>ことを示すほうが効く配点です。
+      </p>
+
+      <h2>4 · 意思決定者（背景資料より）</h2>
+      <div class="who">
+        <div class="card">
+          <div class="role">調達部長</div>
+          <b>Okafor 氏</b>
+          <p class="muted">
+            RFP
+            の発行者。スケジュールと価格が<b>予測できること</b>を重視。最安値よりスケジュールの確度が効く可能性が高い。
+          </p>
+        </div>
+        <div class="card">
+          <div class="role">オペレーション担当 VP</div>
+          <b>Tanaka 氏</b>
+          <p class="muted">
+            実際のユーザーで、社内の推進役。発注推奨機能は同氏の要望。前任ベンダーに不満。
+          </p>
+        </div>
+        <div class="card">
+          <div class="role">IT 部門</div>
+          <b>ゲートキーパー</b>
+          <p class="muted">
+            テストがないことを理由に変更を止めてきた。自動テスト（R3）は事実上の必須条件。
+          </p>
+        </div>
+      </div>
+
+      <h2>5 · 求められている提案書</h2>
+      <table>
+        <tr>
+          <th>RFP §4 の構成</th>
+          <th>今日の扱い</th>
+        </tr>
+        <tr>
+          <td>エグゼクティブサマリー（1ページ以内）</td>
+          <td>書く</td>
+        </tr>
+        <tr>
+          <td>技術アプローチ（前提条件を含む）</td>
+          <td>書く</td>
+        </tr>
+        <tr>
+          <td>関連実績</td>
+          <td>枠だけ用意する</td>
+        </tr>
+        <tr>
+          <td>スケジュール（フェーズ分け）</td>
+          <td>書く</td>
+        </tr>
+        <tr>
+          <td>価格（固定、または上限付き T&amp;M）</td>
+          <td>書く</td>
+        </tr>
+      </table>
+
+      <h2>6 · 勝ち筋の候補</h2>
+      <p>
+        評価者の関心から考えると、たとえば次のような「選ばれる理由」が立てられます。どれを前面に出すかは、あとであなたが決めます。
+      </p>
+      <div class="grid3">
+        <div class="card">
+          <b>確実に進める</b>
+          <p class="muted">段階的な納品と明確な完了基準（Okafor 氏）</p>
+        </div>
+        <div class="card">
+          <b>現場の困りごとから直す</b>
+          <p class="muted">Reports の欠陥と発注推奨（Tanaka 氏）</p>
+        </div>
+        <div class="card">
+          <b>変更を安全にする</b>
+          <p class="muted">
+            最初にテストを整え、IT が承認できる状態に（IT 部門）
+          </p>
+        </div>
+      </div>
+
+      <div class="back">
+        <div>次は、この RFP の曖昧な点（穴）を探します。</div>
+        <span
+          >ターミナルに戻って「Done」または「Next Step」と送ってください</span
+        >
+      </div>
+    </main>
+  </body>
+</html>

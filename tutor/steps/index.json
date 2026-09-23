@@ -34,32 +34,33 @@
     {
       "id": "01-page-rfp",
       "part": "p1",
-      "minutes": 5,
-      "title": "読む: RFP の流れと、応札側が考えること",
+      "minutes": 4,
+      "title": "読む: RFP とは · 一般的な流れと、応札側が考えること",
       "where": "browser",
       "page": "01-rfp-process.html",
-      "hint": "解説ページを読み終えたら、ターミナルに戻って「Done」（または「読みました」「Next Step」）と送ってください。",
+      "hint": "RFP の一般的な解説ページです。読み終えたら、ターミナルに戻って「Done」（または「読みました」「Next Step」）と送ってください。",
       "checks": []
     },
     {
       "id": "02-kickoff",
       "part": "p1",
-      "minutes": 3,
-      "title": "キックオフ · RFP を @ で読み込む",
+      "minutes": 4,
+      "title": "RFP を読む · @ で読み込み、私たちの理解を整理する",
       "where": "cli",
-      "hint": "ターミナルで @docs/rfp/MC-2026-0417.md を自分で入力して、Claude に RFP を読ませます。",
+      "hint": "@docs/rfp/MC-2026-0417.md を自分で入力して RFP を読ませます。Claude の整理のあと、図にしたページが開きます。",
       "checks": [
         [
           "noteSet",
           "kickoff"
         ]
-      ]
+      ],
+      "page": "02-rfp-meridian.html"
     },
     {
       "id": "03-analyze",
       "part": "p1",
       "minutes": 6,
-      "title": "要求を読み解く · 必須と希望、穴、背景資料",
+      "title": "穴を探す · 決めないと見積もれない点と、引き継ぎメモ",
       "where": "cli",
       "hint": "RFP の「穴」（曖昧な点）を一つ以上、自分の言葉で挙げてみてください。",
       "checks": [

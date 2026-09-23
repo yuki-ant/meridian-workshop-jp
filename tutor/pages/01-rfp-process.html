@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>RFP の流れと、応札側が考えること</title>
+    <title>RFP とは — 流れと、応札側が考えること</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link
       rel="stylesheet"
@@ -11,41 +11,6 @@
     />
     <link rel="stylesheet" href="assets/page.css" />
     <style>
-      .weights {
-        display: flex;
-        height: 40px;
-        border-radius: 10px;
-        overflow: hidden;
-        margin: 12px 0 8px;
-        font-size: 13px;
-        font-weight: 600;
-        color: #fff;
-      }
-      .weights div {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        white-space: nowrap;
-        overflow: hidden;
-      }
-      .who {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 14px;
-      }
-      @media (max-width: 720px) {
-        .who {
-          grid-template-columns: 1fr;
-        }
-      }
-      .who .card {
-        margin: 0;
-      }
-      .who .role {
-        font-size: 12px;
-        color: var(--gray);
-        letter-spacing: 0.06em;
-      }
       .check li {
         list-style: none;
         margin-left: -22px;
@@ -62,12 +27,12 @@
   </head>
   <body>
     <main>
-      <div class="kicker">第1幕 · ステップ 01 · 約5分</div>
-      <h1>RFP の流れと、応札側が考えること</h1>
+      <div class="kicker">第1幕 · ステップ 01 · 約4分</div>
+      <h1>RFP とは — 流れと、応札側が考えること</h1>
       <p class="lede">
         RFP（提案依頼書）は、発注側が「こういう仕事を、こういう条件で頼みたい。各社、提案を出してほしい」と公式に呼びかける文書です。このページでは、RFP
-        が発行されてから契約までの一般的な流れと、提案する側（今回のあなた）が押さえるべきポイントを、今回の
-        Meridian 案件に重ねて説明します。
+        が発行されてから契約までの一般的な流れと、提案する側が押さえるべきポイントを説明します。実際の
+        RFP は、このあと一緒に読みます。
       </p>
 
       <h2>1 · RFI・RFP・RFQ の違い</h2>
@@ -81,7 +46,7 @@
         <div class="card" style="border: 2px solid var(--clay)">
           <span class="tag you">RFP</span><b>提案依頼書</b>
           <p class="muted" style="margin-top: 6px">
-            「この課題を、どう解決し、いくらで、いつまでにやるか提案してほしい」。<b>進め方の提案</b>そのものが評価される。今回はこれ。
+            「この課題を、どう解決し、いくらで、いつまでにやるか提案してほしい」。<b>進め方の提案</b>そのものが評価される。
           </p>
         </div>
         <div class="card">
@@ -93,13 +58,10 @@
       </div>
 
       <h2>2 · RFP の標準的な流れ</h2>
-      <p>
-        多くの RFP は、次の8つの段階を踏みます。上段の日付は今回の
-        RFP（MC-2026-0417）のものです。
-      </p>
+      <p>多くの RFP は、次の8つの段階を踏みます。</p>
       <div class="card svgwrap">
         <svg
-          viewBox="0 0 800 200"
+          viewBox="0 0 800 180"
           width="100%"
           style="min-width: 640px"
           role="img"
@@ -107,81 +69,61 @@
         >
           <line
             x1="50"
-            y1="100"
+            y1="80"
             x2="750"
-            y2="100"
+            y2="80"
             stroke="#E3DACC"
             stroke-width="4"
           />
           <g font-size="13" text-anchor="middle">
-            <g>
-              <circle cx="50" cy="100" r="16" fill="#D97757" />
-              <text x="50" y="105" fill="#fff" font-weight="700">1</text>
-              <text x="50" y="140" fill="#141413" font-weight="700">発行</text>
-              <text x="50" y="60" fill="#a5482b">4/17</text>
-            </g>
-            <g>
-              <circle cx="150" cy="100" r="16" fill="#D97757" />
-              <text x="150" y="105" fill="#fff" font-weight="700">2</text>
-              <text x="150" y="140" fill="#141413" font-weight="700">
-                質問期間
-              </text>
-              <text x="150" y="60" fill="#a5482b">〜4/28</text>
-            </g>
-            <g>
-              <circle cx="250" cy="100" r="16" fill="#D97757" />
-              <text x="250" y="105" fill="#fff" font-weight="700">3</text>
-              <text x="250" y="140" fill="#141413" font-weight="700">
-                提案書作成
-              </text>
-              <text x="250" y="60" fill="#a5482b">今日ここ</text>
-            </g>
-            <g>
-              <circle cx="350" cy="100" r="16" fill="#D97757" />
-              <text x="350" y="105" fill="#fff" font-weight="700">4</text>
-              <text x="350" y="140" fill="#141413" font-weight="700">提出</text>
-              <text x="350" y="60" fill="#a5482b">5/8 締切</text>
-            </g>
-            <g>
-              <circle cx="450" cy="100" r="16" fill="#6A9BCC" />
-              <text x="450" y="105" fill="#fff" font-weight="700">5</text>
-              <text x="450" y="140" fill="#141413" font-weight="700">評価</text>
-            </g>
-            <g>
-              <circle cx="550" cy="100" r="16" fill="#6A9BCC" />
-              <text x="550" y="105" fill="#fff" font-weight="700">6</text>
-              <text x="550" y="140" fill="#141413" font-weight="700">
-                最終候補
-              </text>
-              <text x="550" y="158" fill="#73726C">プレゼン</text>
-            </g>
-            <g>
-              <circle cx="650" cy="100" r="16" fill="#6A9BCC" />
-              <text x="650" y="105" fill="#fff" font-weight="700">7</text>
-              <text x="650" y="140" fill="#141413" font-weight="700">交渉</text>
-            </g>
-            <g>
-              <circle cx="750" cy="100" r="16" fill="#629987" />
-              <text x="750" y="105" fill="#fff" font-weight="700">8</text>
-              <text x="750" y="140" fill="#141413" font-weight="700">
-                契約・SOW
-              </text>
-            </g>
+            <circle cx="50" cy="80" r="16" fill="#D97757" />
+            <text x="50" y="85" fill="#fff" font-weight="700">1</text>
+            <text x="50" y="120" fill="#141413" font-weight="700">発行</text>
+            <circle cx="150" cy="80" r="16" fill="#D97757" />
+            <text x="150" y="85" fill="#fff" font-weight="700">2</text>
+            <text x="150" y="120" fill="#141413" font-weight="700">
+              質問期間
+            </text>
+            <circle cx="250" cy="80" r="16" fill="#D97757" />
+            <text x="250" y="85" fill="#fff" font-weight="700">3</text>
+            <text x="250" y="120" fill="#141413" font-weight="700">
+              提案書作成
+            </text>
+            <circle cx="350" cy="80" r="16" fill="#D97757" />
+            <text x="350" y="85" fill="#fff" font-weight="700">4</text>
+            <text x="350" y="120" fill="#141413" font-weight="700">提出</text>
+            <circle cx="450" cy="80" r="16" fill="#6A9BCC" />
+            <text x="450" y="85" fill="#fff" font-weight="700">5</text>
+            <text x="450" y="120" fill="#141413" font-weight="700">評価</text>
+            <circle cx="550" cy="80" r="16" fill="#6A9BCC" />
+            <text x="550" y="85" fill="#fff" font-weight="700">6</text>
+            <text x="550" y="120" fill="#141413" font-weight="700">
+              最終候補
+            </text>
+            <text x="550" y="138" fill="#73726C">プレゼン</text>
+            <circle cx="650" cy="80" r="16" fill="#6A9BCC" />
+            <text x="650" y="85" fill="#fff" font-weight="700">7</text>
+            <text x="650" y="120" fill="#141413" font-weight="700">交渉</text>
+            <circle cx="750" cy="80" r="16" fill="#629987" />
+            <text x="750" y="85" fill="#fff" font-weight="700">8</text>
+            <text x="750" y="120" fill="#141413" font-weight="700">
+              契約・SOW
+            </text>
           </g>
-          <rect x="30" y="178" width="340" height="3" fill="#D97757" />
+          <rect x="30" y="158" width="340" height="3" fill="#D97757" />
           <text
             x="200"
-            y="196"
+            y="176"
             font-size="12"
             text-anchor="middle"
             fill="#a5482b"
           >
             応札側が動く期間
           </text>
-          <rect x="430" y="178" width="240" height="3" fill="#6A9BCC" />
+          <rect x="430" y="158" width="240" height="3" fill="#6A9BCC" />
           <text
             x="550"
-            y="196"
+            y="176"
             font-size="12"
             text-anchor="middle"
             fill="#3d6f9e"
@@ -220,15 +162,12 @@
         <tr>
           <td>最終候補</td>
           <td>上位数社がプレゼンや質疑に呼ばれる</td>
-          <td>今回の RFP にも「スライド10〜15枚を求める場合がある」とある</td>
+          <td>短いスライドを求められることが多い</td>
         </tr>
         <tr>
           <td>契約・SOW</td>
           <td>作業範囲記述書（SOW）で、範囲・成果物・受け入れ基準を確定する</td>
-          <td>
-            提案書に書いた範囲と前提が、そのまま SOW
-            の土台になる。第2幕で扱うのはここから
-          </td>
+          <td>提案書に書いた範囲と前提が、そのまま SOW の土台になる</td>
         </tr>
       </table>
 
@@ -240,9 +179,7 @@
       <div class="grid2">
         <div class="card">
           <b>適合度</b>
-          <p class="muted">
-            自社の得意分野か。似た案件の実績を示せるか（今回は「関連実績」の配点が25%）。
-          </p>
+          <p class="muted">自社の得意分野か。似た案件の実績を示せるか。</p>
         </div>
         <div class="card">
           <b>勝てる見込み</b>
@@ -265,8 +202,8 @@
       <h2>4 · RFP の読み方: 4つの要点</h2>
       <h3 style="margin: 18px 0 6px">① 必須と希望を分ける</h3>
       <p>
-        今回の RFP
-        は、<b>必須項目（R1〜R4）</b>と<b>希望項目（D1〜D3、評価対象だが必須ではない）</b>に分かれています。必須に全部答えたうえで、希望にどこまで踏み込むかが差別化になります。必須項目への対応が抜けていると、他がどれだけ良くても評価は大きく下がります。
+        多くの RFP
+        は、<b>必須項目</b>と<b>希望項目</b>（評価対象だが必須ではない）を分けて書いています。必須に全部答えたうえで、希望にどこまで踏み込むかが差別化になります。必須への対応が抜けていると、他がどれだけ良くても評価は大きく下がります。
       </p>
 
       <h3 style="margin: 18px 0 6px">② 曖昧な点・穴を拾う</h3>
@@ -285,55 +222,22 @@
         </li>
         <li>誰が何を用意するのか（データ、環境、テスト担当者）</li>
       </ul>
-      <p class="muted">
-        このあとのステップで、今回の RFP の穴を実際に探してもらいます。
-      </p>
 
       <h3 style="margin: 18px 0 6px">③ 評価配点を読む</h3>
-      <p>配点は、発注側が何を重視しているかの一番正直な表明です。</p>
-      <div class="weights">
-        <div style="width: 40%; background: #d97757">技術アプローチ 40%</div>
-        <div style="width: 25%; background: #6a9bcc">関連実績 25%</div>
-        <div style="width: 20%; background: #629987">スケジュール 20%</div>
-        <div style="width: 15%; background: #788c5d">価格 15%</div>
-      </div>
-      <p class="muted">
-        今回は価格が15%しかありません。安さで勝つより、「要件を正しく理解し、確実に進められる」ことを示すほうが効く配点です。
+      <p>
+        配点は、発注側が何を重視しているかの一番正直な表明です。たとえば価格の配点が低ければ、安さで勝つより「要件を正しく理解し、確実に進められる」ことを示すほうが効きます。
       </p>
 
       <h3 style="margin: 18px 0 6px">④ 意思決定者を読む</h3>
       <p>
-        RFP
-        を出すのは組織ですが、採点するのは人です。立場ごとに関心が違います。今回の背景資料によると:
+        RFP を出すのは組織ですが、採点するのは人です。調達、実際の利用部門、IT
+        など、立場ごとに関心が違います。誰が推進役で、誰が止める力を持っているかを押さえます。
       </p>
-      <div class="who">
-        <div class="card">
-          <div class="role">調達部長</div>
-          <b>Okafor 氏</b>
-          <p class="muted">
-            RFP の発行者。スケジュールと価格が<b>予測できること</b>を重視。
-          </p>
-        </div>
-        <div class="card">
-          <div class="role">オペレーション担当 VP</div>
-          <b>Tanaka 氏</b>
-          <p class="muted">
-            実際のユーザーで、社内の推進役。前任ベンダーに不満。現場の課題に響く提案を求めている。
-          </p>
-        </div>
-        <div class="card">
-          <div class="role">IT 部門</div>
-          <b>ゲートキーパー</b>
-          <p class="muted">
-            テストがないことを理由に変更を止めてきた。自動テスト（R3）は事実上の必須条件。
-          </p>
-        </div>
-      </div>
 
       <h2>5 · 提案書の構成と書き方</h2>
       <p>
-        今回の RFP §4
-        は、次の構成を指定しています（今日は時間の都合で、このうち4つを書きます）。
+        RFP
+        は多くの場合、提案書の構成を指定しています。よくある構成と、ありがちな失敗:
       </p>
       <table>
         <tr>
@@ -350,9 +254,7 @@
         </tr>
         <tr>
           <td>技術アプローチ</td>
-          <td>
-            各要件（R1〜R4、D1〜D3）に<b>どう</b>取り組むか。リスクと完了の判定基準も
-          </td>
+          <td>各要件に<b>どう</b>取り組むか。リスクと完了の判定基準も</td>
           <td>
             要件と対応の関係が見えない。<b>要件対応表</b>（どの要件に、どの節で答えたか）を添えると採点しやすい
           </td>
@@ -360,7 +262,7 @@
         <tr>
           <td>関連実績</td>
           <td>似た案件の実績</td>
-          <td>（今日は扱いません）</td>
+          <td>案件と関係の薄い実績を並べる</td>
         </tr>
         <tr>
           <td>スケジュール</td>
@@ -381,47 +283,33 @@
         <div class="card">
           <b>固定価格</b>
           <p class="muted">
-            発注側は予算が読みやすい（Okafor
-            氏好み）。代わりに、範囲が広がったときのリスクは受注側が負う。<b>前提条件</b>で範囲を明確にするのが必須。
+            発注側は予算が読みやすい。代わりに、範囲が広がったときのリスクは受注側が負う。<b>前提条件</b>で範囲を明確にするのが必須。
           </p>
         </div>
         <div class="card">
           <b>上限付き T&amp;M</b>
           <p class="muted">
-            かかった時間で精算し、上限額を約束する。範囲が曖昧な仕事（今回の R1
-            の「少なくとも8件」など）に向く。
+            かかった時間で精算し、上限額を約束する。範囲が曖昧な仕事に向く。
           </p>
         </div>
       </div>
       <div class="card dark">
         <b>前提条件は、提案書の「保険」</b>
         <p class="muted" style="margin-top: 6px">
-          「R1
-          は、着手時に双方で合意した欠陥リストをもって完了とする」のように、見積もりの根拠となる前提を明記します。質問期間でクライアントから得た回答は、ここに書きます。後で「そんな話は聞いていない」を防ぐ一文です。
+          見積もりの根拠となる前提を明記します（例:「着手時に双方で合意した一覧をもって完了とする」）。質問期間で得た回答も、ここに書きます。後で「そんな話は聞いていない」を防ぐ一文です。
         </p>
       </div>
 
       <h2>6 · 勝ち筋（ウィンテーマ）を決める</h2>
       <p>
-        強い提案書には、全体を貫く2〜3個の「選ばれる理由」があります。評価者それぞれの関心に答える形で決めるのがコツです。たとえば今回なら:
-      </p>
-      <ul>
-        <li><b>確実に進める</b>: 段階的な納品と明確な完了基準（Okafor 氏）</li>
-        <li>
-          <b>現場の困りごとから直す</b>: Reports の欠陥と発注推奨（Tanaka 氏）
-        </li>
-        <li>
-          <b>変更を安全にする</b>: 最初にテストを整え、IT が承認できる状態に（IT
-          部門）
-        </li>
-      </ul>
-      <p class="muted">
-        これは一例です。あなたの提案書では、あなた自身の言葉で決めてください。
+        強い提案書には、全体を貫く2〜3個の「選ばれる理由」があります。評価者それぞれの関心に答える形で決めるのがコツです。たとえば「確実に進める」「現場の困りごとから直す」「変更を安全にする」のように、誰のどの関心に応えるのかが分かる言葉にします。
       </p>
 
       <div class="back">
-        <div>次は、実際の RFP を @ で読み込みます。</div>
-        <span>ターミナルに戻って「Done」または「Next Step」と送ってください</span>
+        <div>次は、実際の RFP を読み、この観点で整理します。</div>
+        <span
+          >ターミナルに戻って「Done」または「Next Step」と送ってください</span
+        >
       </div>
     </main>
   </body>
