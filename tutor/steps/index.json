@@ -5,7 +5,7 @@
     {
       "id": "p1",
       "title": "第1幕 · RFP に応札する（提案書づくり）",
-      "minutes": 42
+      "minutes": 34
     },
     {
       "id": "p2",
@@ -22,19 +22,17 @@
       "where": "cli",
       "page": "map.html",
       "hint": "このタブは開いたままにしてください。ターミナルに戻り、Claude の案内に沿って進めます。",
-      "checks": [["env"], ["repoReady"]]
+      "checks": [
+        [
+          "env"
+        ],
+        [
+          "repoReady"
+        ]
+      ]
     },
     {
-      "id": "01-kickoff",
-      "part": "p1",
-      "minutes": 3,
-      "title": "キックオフ · RFP を @ で読み込む",
-      "where": "cli",
-      "hint": "ターミナルで @docs/rfp/MC-2026-0417.md を自分で入力して、Claude に RFP を読ませます。",
-      "checks": [["noteSet", "kickoff"]]
-    },
-    {
-      "id": "02-page-rfp",
+      "id": "01-page-rfp",
       "part": "p1",
       "minutes": 5,
       "title": "読む: RFP の流れと、応札側が考えること",
@@ -44,76 +42,120 @@
       "checks": []
     },
     {
+      "id": "02-kickoff",
+      "part": "p1",
+      "minutes": 3,
+      "title": "キックオフ · RFP を @ で読み込む",
+      "where": "cli",
+      "hint": "ターミナルで @docs/rfp/MC-2026-0417.md を自分で入力して、Claude に RFP を読ませます。",
+      "checks": [
+        [
+          "noteSet",
+          "kickoff"
+        ]
+      ]
+    },
+    {
       "id": "03-analyze",
       "part": "p1",
       "minutes": 8,
       "title": "要求を読み解く · 必須と希望、穴、背景資料",
       "where": "cli",
       "hint": "RFP の「穴」（曖昧な点）を一つ以上、自分の言葉で挙げてみてください。",
-      "checks": [["noteSet", "gaps"]]
+      "checks": [
+        [
+          "noteSet",
+          "gaps"
+        ]
+      ]
     },
     {
-      "id": "04-questions",
+      "id": "04-proposal",
+      "part": "p1",
+      "minutes": 10,
+      "title": "提案の方針を決める · 提案書は Claude が一気に書く",
+      "where": "cli",
+      "hint": "選択肢が出たら、コンサルタントとして提案の方針を4つ選んでください。提案書の作文は Claude が一気にやります。",
+      "checks": [
+        [
+          "fileExists",
+          "proposal/proposal.md"
+        ],
+        [
+          "noteSet",
+          "decisions"
+        ]
+      ]
+    },
+    {
+      "id": "05-deck",
       "part": "p1",
       "minutes": 5,
-      "title": "確認事項 · クライアント役として答える",
+      "title": "HTML ページとスライドにする · 提案書を見せる形に",
       "where": "cli",
-      "hint": "選択肢が出たら、クライアントになったつもりで答えます。その答えが提案書の前提条件になります。",
-      "checks": [["noteSet", "assumptions"]]
-    },
-    {
-      "id": "05-proposal",
-      "part": "p1",
-      "minutes": 12,
-      "title": "提案書を書く · 4セクションを1つずつ",
-      "where": "cli",
-      "hint": "技術アプローチの前に Shift+Tab で Plan Mode に。各セクションのあと、直したい点を1つは伝えましょう。",
+      "hint": "提案書の HTML ページとスライドが開いたら、ちゃんと表示されているかだけ確かめてください。細かい手直しは不要です。",
       "checks": [
-        ["globExists", "proposal", ".md", 4],
-        ["noteSet", "edit"]
+        [
+          "fileExists",
+          "proposal/proposal.html"
+        ],
+        [
+          "fileExists",
+          "proposal/capabilities-deck.html"
+        ]
       ]
     },
     {
-      "id": "06-deck",
-      "part": "p1",
-      "minutes": 6,
-      "title": "デッキを作る · HTML スライドと1回の修正",
-      "where": "cli",
-      "hint": "デッキをブラウザで開き、変えたいところ（順番・色・枚数など）を1つ伝えてください。",
-      "checks": [
-        ["fileExists", "proposal/capabilities-deck.html"],
-        ["noteSet", "deck_revision"]
-      ]
-    },
-    {
-      "id": "07-env",
+      "id": "06-env",
       "part": "p2",
       "minutes": 6,
       "title": "受注 · 環境を確認し、/start でアプリを起動",
       "where": "cli",
       "hint": "/start は自分で入力します。起動したら http://localhost:3000 を開き、Reports ページを見てみましょう。",
       "checks": [
-        ["env"],
-        ["portOpen", 8001, "バックエンド"],
-        ["portOpen", 3000, "フロントエンド"],
-        ["noteSet", "reports_issue"]
+        [
+          "env"
+        ],
+        [
+          "portOpen",
+          8001,
+          "バックエンド"
+        ],
+        [
+          "portOpen",
+          3000,
+          "フロントエンド"
+        ],
+        [
+          "noteSet",
+          "reports_issue"
+        ]
       ]
     },
     {
-      "id": "08-plan-r1",
+      "id": "07-plan-r1",
       "part": "p2",
       "minutes": 8,
       "title": "R1 の範囲を絞る · ブランチと Plan Mode",
       "where": "cli",
       "hint": "Shift+Tab で Plan Mode に切り替えてから、Claude の計画を読みます。範囲は「フィルターが効く」まで。",
       "checks": [
-        ["onFeatureBranch"],
-        ["treeClean", "client", "server"],
-        ["noteSet", "r1_scope"]
+        [
+          "onFeatureBranch"
+        ],
+        [
+          "treeClean",
+          "client",
+          "server"
+        ],
+        [
+          "noteSet",
+          "r1_scope"
+        ]
       ]
     },
     {
-      "id": "09-build-r1",
+      "id": "08-build-r1",
       "part": "p2",
       "minutes": 20,
       "title": "R1 を実装する · フィルターを Reports につなぐ",
@@ -138,18 +180,30 @@
           "reports/(quarterly|monthly-trends)",
           "api.js への reports エンドポイント登録"
         ],
-        ["commitTouches", "client/src/views/Reports.vue"],
-        ["treeClean", "client", "server"]
+        [
+          "commitTouches",
+          "client/src/views/Reports.vue"
+        ],
+        [
+          "treeClean",
+          "client",
+          "server"
+        ]
       ]
     },
     {
-      "id": "10-wrap",
+      "id": "09-wrap",
       "part": "p2",
       "minutes": 5,
       "title": "まとめ · 進捗報告と次フェーズへの引き継ぎ",
       "where": "cli",
       "hint": "今回の成果と、残りの R1〜R4 を「次フェーズ」として引き継ぎメモにまとめます。",
-      "checks": [["fileExists", "proposal/next-phase.md"]]
+      "checks": [
+        [
+          "fileExists",
+          "proposal/next-phase.md"
+        ]
+      ]
     }
   ]
 }

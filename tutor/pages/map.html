@@ -215,6 +215,11 @@
         <b>いまやること</b><span id="hintText"></span>
       </div>
 
+      <div id="delivWrap" style="display: none">
+        <h2>あなたの成果物</h2>
+        <div class="card" id="deliv"></div>
+      </div>
+
       <h2>全体マップ</h2>
       <div class="parts" id="parts"></div>
       <p class="off" id="off"></p>
@@ -287,6 +292,20 @@
             ? ""
             : "none";
           if (s.hint) document.getElementById("hintText").textContent = s.hint;
+
+          // the learner's own HTML deliverables under proposal/, served by this same page server
+          const dl = s.deliverables || [];
+          document.getElementById("delivWrap").style.display = dl.length ? "" : "none";
+          const dv = document.getElementById("deliv");
+          dv.innerHTML = "";
+          for (const f of dl) {
+            const a = el("a", null, f.name);
+            a.href = f.url;
+            a.target = "_blank";
+            const row = el("div", "step");
+            row.appendChild(a);
+            dv.appendChild(row);
+          }
 
           const parts = document.getElementById("parts");
           parts.innerHTML = "";

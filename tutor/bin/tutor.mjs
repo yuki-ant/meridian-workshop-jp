@@ -37,6 +37,7 @@ const INDEX = JSON.parse(
 const STEPS = INDEX.steps;
 const SELF = "node tutor/bin/tutor.mjs";
 const SERVER_NAME = "meridian-tutor";
+const PROPOSAL_DIR = path.join(ROOT, "proposal");
 const TOTAL_MIN = STEPS.reduce((a, s) => a + (s.minutes || 0), 0);
 
 // ── state ────────────────────────────────────────────────────────────────────
@@ -49,6 +50,39 @@ function load() {
     s.seen ||= [];
     s.notes ||= {};
     s.done ||= [];
+    // The RFP explainer moved ahead of the kickoff: keep progress files written with the old step ids working
+    if (!s.idsV2) {
+      const ren = { "01-kickoff": "02-kickoff", "02-page-rfp": "01-page-rfp" };
+      const r = (id) => ren[id] || id;
+      s.step = r(s.step);
+      s.done.forEach((d) => {
+        d.id = r(d.id);
+      });
+      s.seen = s.seen.map(r);
+      s.idsV2 = true;
+    }
+    // The client-questions and write-each-section steps became one step: the learner decides, Claude drafts in one go
+    if (!s.idsV3) {
+      const ren = {
+        "04-questions": "04-proposal",
+        "05-proposal": "04-proposal",
+        "06-deck": "05-deck",
+        "07-env": "06-env",
+        "08-plan-r1": "07-plan-r1",
+        "09-build-r1": "08-build-r1",
+        "10-wrap": "09-wrap",
+      };
+      const r = (id) => ren[id] || id;
+      s.step = r(s.step);
+      // the new step counts as done only if the old writing step was done; the questions step alone is not enough
+      const seenDone = new Set();
+      s.done = s.done
+        .filter((d) => d.id !== "04-questions")
+        .map((d) => ({ ...d, id: r(d.id) }))
+        .filter((d) => !seenDone.has(d.id) && seenDone.add(d.id));
+      s.seen = [...new Set(s.seen.map(r))];
+      s.idsV3 = true;
+    }
     return s;
   } catch {
     return {
@@ -59,6 +93,8 @@ function load() {
       notes: {},
       seen: [],
       baseBranch: null,
+      idsV2: true,
+      idsV3: true,
     };
   }
 }
@@ -394,6 +430,11 @@ const MIME = {
   ".png": "image/png",
   ".json": "application/json",
   ".woff2": "font/woff2",
+  ".jpg": "image/jpeg",
+  ".jpeg": "image/jpeg",
+  ".gif": "image/gif",
+  ".webp": "image/webp",
+  ".md": "text/plain; charset=utf-8",
 };
 function publicState() {
   const s = load();
@@ -412,6 +453,17 @@ function publicState() {
     current: curStep ? curStep.id : null,
     finishedAt: s.finishedAt || null,
     hint: curStep && curStep.hint ? curStep.hint : null,
+    deliverables: (() => {
+      try {
+        return fs
+          .readdirSync(PROPOSAL_DIR)
+          .filter((f) => f.endsWith(".html"))
+          .sort()
+          .map((f) => ({ name: f, url: `/proposal/${encodeURIComponent(f)}` }));
+      } catch {
+        return [];
+      }
+    })(),
     parts: INDEX.parts,
     steps: STEPS.map((st, i) => {
       const d = s.done.find((x) => x.id === st.id);
@@ -505,10 +557,17 @@ function serve(port) {
       });
       return res.end(JSON.stringify(publicState()));
     }
-    const rel = url === "/" ? "/index.html" : url;
-    const file = path.normalize(path.join(root, rel));
+    // /proposal/… serves the learner's own deliverables (proposal.html, the deck), so they open like the tutor's pages
+    const isProposal = url === "/proposal" || url.startsWith("/proposal/");
+    const base = isProposal ? PROPOSAL_DIR : root;
+    const rel = isProposal
+      ? url.slice("/proposal".length) || "/"
+      : url === "/"
+        ? "/index.html"
+        : url;
+    const file = path.normalize(path.join(base, rel));
     if (
-      !file.startsWith(root) ||
+      !(file === base || file.startsWith(base + path.sep)) ||
       !fs.existsSync(file) ||
       fs.statSync(file).isDirectory()
     ) {
@@ -746,7 +805,9 @@ function openInBrowser(url) {
 // Late = past the planned END of the current step; early = still before its planned START. Time inside the step is on plan.
 function paceLine(s) {
   if (s.finishedAt) return "";
-  const el = elapsedMin(s), end = plannedUntil(s.step), start = end - (current(s).minutes || 0);
+  const el = elapsedMin(s),
+    end = plannedUntil(s.step),
+    start = end - (current(s).minutes || 0);
   return el > end + 2
     ? `予定より約 ${el - end} 分遅れています。`
     : el < start - 5
@@ -864,8 +925,10 @@ switch (cmd) {
     }
     for (const r of res) console.log(`PASS  ${r.msg}`);
     s.done.push({ id: st.id, at: now() });
-    const i = stepIndex(s.step);
-    if (i + 1 < STEPS.length) s.step = STEPS[i + 1].id;
+    // move to the next step not done yet (a reordered step list can leave a later step already done)
+    let i = stepIndex(s.step) + 1;
+    while (i < STEPS.length && s.done.some((d) => d.id === STEPS[i].id)) i++;
+    if (i < STEPS.length) s.step = STEPS[i].id;
     else s.finishedAt = now();
     markSeen(s);
     save(s);
@@ -922,14 +985,19 @@ switch (cmd) {
     serve(Number(args[0]) || PORT);
     break;
   case "open": {
-    const page = args[0] || "index.html";
+    const page = (args[0] || "index.html").replace(/^\/+/, "");
     const ok = await ensureServer();
-    const url = ok
-      ? `http://localhost:${PORT}/${page}`
-      : `file://${path.join(PLUGIN, "pages", page)}`;
+    const local = page.startsWith("proposal/")
+      ? path.join(ROOT, page)
+      : path.join(PLUGIN, "pages", page);
+    if (!fs.existsSync(local)) {
+      console.error(`ファイルがありません: ${local}`);
+      process.exit(1);
+    }
+    const url = ok ? `http://localhost:${PORT}/${page}` : `file://${local}`;
     if (!process.env.TUTOR_NO_OPEN) openInBrowser(url);
     console.log(
-      `${url}\n（ブラウザが開かない場合、たとえばリモート環境では、このアドレスを自分で開いてもらってください。ファイルは ${path.join(PLUGIN, "pages", page)}）`,
+      `${url}\n（ブラウザが開かない場合、たとえばリモート環境では、このアドレスを自分で開いてもらってください。ファイルは ${local}）`,
     );
     log("open", { page });
     break;
