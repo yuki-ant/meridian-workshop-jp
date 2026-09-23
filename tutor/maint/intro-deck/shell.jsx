@@ -1,5 +1,5 @@
 /* shell.jsx — the small runtime of the introduction deck: one 1280×720 canvas scaled to the window, keyboard and
-   button navigation, a page counter, presenter notes (N) and a print view (?print). Everything the slides share
+   button navigation, a page counter, an overview of page thumbnails (Esc), presenter notes (N) and a print view (?print). Everything the slides share
    (palette, fonts, Slide, the phrase helpers, the animation hook) is defined here. build.mjs compiles this file and
    slides.jsx into one script, so they share a scope; nothing is put on window. */
 
@@ -65,13 +65,18 @@ function Deck({ slides }) {
   const N = slides.length;
   const [idx, setIdx] = useState(() => readHash(N));
   const [notes, setNotes] = useState(false);
+  // Esc opens the overview: every page as a live thumbnail, so a reader can jump back and forth without paging.
+  const [overview, setOverview] = useState(false);
+  const [vw, setVw] = useState(() => window.innerWidth);
   const root = useRef(null);
+  const cols = vw >= 1100 ? 4 : vw >= 760 ? 3 : 2;
 
   useEffect(() => {
     if (IS_PRINT) return undefined;
     const fit = () => {
       const s = Math.min(window.innerWidth / CANVAS_W, window.innerHeight / CANVAS_H);
       if (root.current) root.current.style.setProperty('--deck-scale', String(s));
+      setVw(window.innerWidth);
     };
     fit();
     window.addEventListener('resize', fit);
@@ -84,7 +89,19 @@ function Deck({ slides }) {
     const onKey = (e) => {
       if (e.metaKey || e.ctrlKey || e.altKey) return;
       const k = e.key;
-      if (k === 'ArrowRight' || k === 'PageDown' || k === ' ' || k === 'Enter') { e.preventDefault(); go(1); }
+      if (overview) {
+        // In the overview the arrows move the highlight, and Enter, Space or Esc goes back to the highlighted page.
+        if (k === 'Escape' || k === 'Enter' || k === ' ') { e.preventDefault(); setOverview(false); }
+        else if (k === 'ArrowRight') { e.preventDefault(); go(1); }
+        else if (k === 'ArrowLeft') { e.preventDefault(); go(-1); }
+        else if (k === 'ArrowDown') { e.preventDefault(); go(cols); }
+        else if (k === 'ArrowUp') { e.preventDefault(); go(-cols); }
+        else if (k === 'Home') setIdx(0);
+        else if (k === 'End') setIdx(N - 1);
+        return;
+      }
+      if (k === 'Escape') { e.preventDefault(); setOverview(true); }
+      else if (k === 'ArrowRight' || k === 'PageDown' || k === ' ' || k === 'Enter') { e.preventDefault(); go(1); }
       else if (k === 'ArrowLeft' || k === 'PageUp' || k === 'Backspace') { e.preventDefault(); go(-1); }
       else if (k === 'Home') setIdx(0);
       else if (k === 'End') setIdx(N - 1);
@@ -98,7 +115,7 @@ function Deck({ slides }) {
     window.addEventListener('keydown', onKey);
     window.addEventListener('hashchange', onHash);
     return () => { window.removeEventListener('keydown', onKey); window.removeEventListener('hashchange', onHash); };
-  }, [N]);
+  }, [N, overview, cols]);
 
   useEffect(() => {
     if (IS_PRINT) return;
@@ -120,6 +137,10 @@ function Deck({ slides }) {
   }
 
   const Cur = slides[idx].c;
+  const PAD = 40;
+  const GAP = 22;
+  const tw = Math.floor((vw - PAD * 2 - GAP * (cols - 1)) / cols);
+  const th = Math.round((tw * CANVAS_H) / CANVAS_W);
   const btn = (label, d, off) => (
     <button
       type="button" aria-label={label} disabled={off} onClick={() => setIdx((i) => Math.max(0, Math.min(N - 1, i + d)))}
@@ -137,15 +158,46 @@ function Deck({ slides }) {
           {slides[idx].notes}
         </div>
       )}
-      <div style={{ position: 'absolute', left: 0, bottom: 0, height: 3, width: `${((idx + 1) / N) * 100}%`, background: C.CLAY, transition: 'width 0.3s ease' }} />
-      <div style={{ position: 'absolute', right: 14, bottom: 12, display: 'flex', alignItems: 'center', gap: 2, background: 'rgba(20,20,19,0.78)', color: '#FAF9F5', border: '1px solid rgba(250,249,245,0.22)', borderRadius: 999, padding: '3px 6px', font: `12px/1 ${MONO}`, userSelect: 'none' }}>
+      {overview && (
+        <div style={{ position: 'absolute', inset: 0, zIndex: 5, background: C.SLATE, overflow: 'auto', padding: `28px ${PAD}px 64px`, fontFamily: SANS }}>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 16, marginBottom: 20 }}>
+            <span style={{ fontSize: 22, fontWeight: 700, color: C.IVORY }}>ページ一覧</span>
+            <span style={{ font: `12px/1.4 ${MONO}`, color: 'rgba(250,249,245,0.6)' }}>クリックでそのページへ · 矢印キーで選んで Enter · Esc で戻る</span>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: `repeat(${cols}, ${tw}px)`, gap: `${GAP}px` }}>
+            {slides.map((s, i) => (
+              <div
+                key={i} role="button" tabIndex={-1} aria-label={`${i + 1} ページへ`} onClick={() => { setIdx(i); setOverview(false); }}
+                ref={i === idx ? (el) => { if (el && el.scrollIntoView) el.scrollIntoView({ block: 'nearest' }); } : null}
+                style={{ cursor: 'pointer' }}
+              >
+                <div style={{ position: 'relative', width: tw, height: th, overflow: 'hidden', borderRadius: 8, outline: i === idx ? `3px solid ${C.CLAY}` : '1px solid rgba(250,249,245,0.2)', outlineOffset: i === idx ? 3 : 0, '--deck-scale': String(tw / CANVAS_W) }}>
+                  <s.c />
+                  <div style={{ position: 'absolute', inset: 0 }} />
+                </div>
+                <div style={{ display: 'flex', gap: 8, marginTop: 8, fontSize: 12.5, lineHeight: 1.45, color: i === idx ? C.IVORY : 'rgba(250,249,245,0.72)' }}>
+                  <span style={{ font: `600 12px/1.5 ${MONO}`, color: C.CLAY, flexShrink: 0 }}>{String(i + 1).padStart(2, '0')}</span>
+                  <span>{s.title}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      <div style={{ position: 'absolute', left: 0, bottom: 0, height: 3, width: `${((idx + 1) / N) * 100}%`, background: C.CLAY, transition: 'width 0.3s ease', zIndex: 6 }} />
+      <div style={{ position: 'absolute', right: 14, bottom: 12, display: 'flex', alignItems: 'center', gap: 2, background: 'rgba(20,20,19,0.78)', color: '#FAF9F5', border: '1px solid rgba(250,249,245,0.22)', borderRadius: 999, padding: '3px 6px', font: `12px/1 ${MONO}`, userSelect: 'none', zIndex: 6 }}>
+        <button type="button" aria-label="ページ一覧" title="ページ一覧（Esc）" onClick={() => setOverview((v) => !v)} style={{ all: 'unset', cursor: 'pointer', padding: '4px 8px 4px 10px', display: 'inline-flex' }}>
+          <svg viewBox="0 0 14 14" width="13" height="13" aria-hidden="true"><path d="M1 1h5v5H1zM8 1h5v5H8zM1 8h5v5H1zM8 8h5v5H8z" fill="none" stroke="currentColor" strokeWidth="1.4" /></svg>
+        </button>
         {btn('前のページ', -1, idx === 0)}
         <span style={{ minWidth: 52, textAlign: 'center' }}>{idx + 1} / {N}</span>
         {btn('次のページ', 1, idx === N - 1)}
       </div>
-      <div style={{ position: 'absolute', left: 14, bottom: 12, font: `12px/1 ${MONO}`, color: 'rgba(115,114,108,0.9)', userSelect: 'none' }}>
-        ← → で移動 · N ノート · F 全画面
-      </div>
+      {!overview && (
+        <div style={{ position: 'absolute', left: 14, bottom: 12, font: `12px/1 ${MONO}`, color: 'rgba(115,114,108,0.9)', userSelect: 'none' }}>
+          ← → で移動 · Esc 一覧 · N ノート · F 全画面
+        </div>
+      )}
     </div>
   );
 }

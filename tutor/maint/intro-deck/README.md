@@ -4,7 +4,7 @@
 
 | ファイル | 役割 |
 | --- | --- |
-| `shell.jsx` | 小さなランタイム。1280×720 のキャンバスをウィンドウに合わせて拡大縮小し、キー操作、ページ番号、講師用ノート（N）、印刷表示（`?print`）を受け持つ。配色とフォントは `tutor/pages/assets/page.css` と同じ |
+| `shell.jsx` | 小さなランタイム。1280×720 のキャンバスをウィンドウに合わせて拡大縮小し、キー操作、ページ番号、ページ一覧（Esc）、講師用ノート（N）、印刷表示（`?print`）を受け持つ。配色とフォントは `tutor/pages/assets/page.css` と同じ |
 | `slides.jsx` | 各ページと、講師用ノート（末尾の `SLIDES`） |
 | `build.mjs` | 上の2つを `tutor/pages/intro/deck.js` にコンパイルする |
 | `tutor/pages/intro/presenter.js` | 講師紹介ページの内容。**ここだけはビルド不要**で、書き換えればそのまま反映される。このページが出るのは `deck.html?present` で開いたときだけ（参加者がステップ 01 で自分で読むときには出ない）。`name` を消すと `?present` でも出ない |
