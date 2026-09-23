@@ -11,8 +11,8 @@ const QS = new URLSearchParams(location.search);
 const IS_PRINT = QS.has('print');
 // ?static freezes every animation on its most telling frame (screenshots, print).
 const IS_STATIC = IS_PRINT || QS.has('static');
-// ?present adds the speaker page: for an instructor showing the deck to a room. A learner reading alone does not get it.
-const IS_PRESENT = QS.has('present');
+// The speaker page shows whenever presenter.js names a presenter; ?nospeaker leaves it out (a partner running the kit alone).
+const SHOW_SPEAKER = !QS.has('nospeaker');
 
 // Same palette and font stacks as tutor/pages/assets/page.css, so the deck reads as one of the workshop's pages.
 const C = {

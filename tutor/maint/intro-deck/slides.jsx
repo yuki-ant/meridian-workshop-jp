@@ -1,5 +1,5 @@
-/* slides.jsx — the pages of the introduction deck: eleven, ending on a thank-you page, plus a speaker page when the deck is opened with ?present and
-   presenter.js names a presenter. Layout is sized off the 1280×720 canvas with flex and %, never a literal canvas width.
+/* slides.jsx — the pages of the introduction deck: eleven, ending on a thank-you page, plus a speaker page as page 2 when presenter.js names a
+   presenter (?nospeaker leaves it out). Layout is sized off the 1280×720 canvas with flex and %, never a literal canvas width.
    Copy stays short: what a presenter would say lives in each slide's `notes`.
    The deck must not give away what the learner is meant to find out (the gaps in the RFP, how thin the hand-off memo is,
    which KPI tiles ignore the filters): the app mock shows every tile as the app does and never shows values reacting or
@@ -54,7 +54,7 @@ function Slide_Title() {
   );
 }
 
-/* ── Speaker — with ?present, and only when tutor/pages/intro/presenter.js names a presenter ── */
+/* ── Speaker — page 2 whenever tutor/pages/intro/presenter.js names a presenter (?nospeaker leaves it out) ── */
 function Slide_Speaker() {
   const P = window.PRESENTER || {};
   const initials = String(P.name || '').split(/\s+/).filter(Boolean).map((w) => w[0]).join('').slice(0, 2).toUpperCase();
@@ -614,7 +614,7 @@ function Slide_Thanks() {
 
 const SLIDES = [
   { c: Slide_Title, title: 'Claude が Claude を教える', notes: 'パートナー向けの、セルフペース型の Claude ハンズオンワークショップです。進めるのは講師ではなく、Claude Code 自身です。あなたのターミナルの中で、約 90 分かけて 1 ステップずつ案内します。題材は、Meridian Components という架空のクライアントの RFP です。第1幕でコンサルタントとして応札し、受注した第2幕で、最初の改修を納品します。' },
-  IS_PRESENT && window.PRESENTER && window.PRESENTER.name && { c: Slide_Speaker, title: '講師紹介', notes: '自己紹介です。名前と所属、これまでの経歴を、30 秒ほどで話します。' },
+  SHOW_SPEAKER && window.PRESENTER && window.PRESENTER.name && { c: Slide_Speaker, title: '講師紹介', notes: '自己紹介です。名前と所属、これまでの経歴を、30 秒ほどで話します。' },
   { c: Slide_How, title: 'Claude が 1 ステップずつ案内し、あなたが判断して手を動かす', notes: '進み方は、いつも同じです。Claude が次にやることと目安の時間を伝えます。短いページを読むこともあります。読み終えたり、作業が終わったりしたら、ターミナルに戻って「Done」と送ります。「できました」でも構いません。スラッシュコマンド、Shift+Tab、@ によるファイル参照、許可の確認は、あなたにしか入力できないので、Claude は何を入力するかを伝えて待ちます。そのあと Claude が、リポジトリの状態と記録を見て、そのステップの完了条件が満たされているかを確かめます。読むだけのステップは、「Done」でそのまま進みます。[ターミナル、ページ、緑の囲みの順に指す]' },
   { c: Slide_Case, title: 'あなたはコンサルタント。Meridian Components から RFP が届いた', notes: 'あなたの役は、RFP に応札するコンサルタントです。クライアントは Meridian Components。産業用オートメーション部品のディストリビューターで、倉庫はサンフランシスコ、ロンドン、東京にあります。依頼は、在庫管理ダッシュボードのモダナイズと機能拡張です。必須項目は R1 から R5 までで、優先順位順に並んでいます。最優先の R1 が、今日の第2幕で直すものです。手元には、RFP の本体、自社でまとめた背景メモ、前任ベンダーの引き継ぎメモ、そしてソースコードがあります。エンジニアでなくても進められます。決めるのはあなたで、提案書の文章とコードは Claude が書きます。' },
   { c: Slide_Agenda, title: '応札する第1幕、納品する第2幕、最後に進捗レポート', notes: '全体は 12 ステップです。第1幕は約 34 分。RFP とは何かを読み、実際の RFP を @ で読み込み、決めないと見積もれない点を探し、提案の方針を 4 つ決めます。提案書の文章は Claude が一気に書き、HTML のページとスライドにもします。第2幕は約 51 分。/start でアプリを起動して症状を確かめ、Plan Mode で原因を調べ、直してコミットし、サブエージェントのレビューから直す指摘を選びます。いちばん長いのは R1 を直すステップで、22 分です。最後に Claude が進捗レポートを作ります。合計は約 85 分で、5 分ほどの予備があります。色付きのラベルは、そのステップで初めて使う Claude Code の機能です。必要になったときに Claude が紹介します。' },

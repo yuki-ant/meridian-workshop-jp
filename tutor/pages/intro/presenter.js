@@ -1,6 +1,6 @@
 // 紹介スライドの「講師紹介」ページの内容です。講師が変わるときは、このファイルだけを書き換えてください（ビルドは不要）。
-// このページが表示されるのは、スライドを deck.html?present で開いたときだけです（参加者が自分で読むときには出ません）。
-// window.PRESENTER を空（null）にするか name を消すと、?present でも表示されません。
+// タイトルの次のページとして、いつも表示されます。
+// window.PRESENTER を空（null）にするか name を消す、またはスライドを deck.html?nospeaker で開くと、表示されません。
 // photo には、このフォルダからの相対パス（例: "assets/presenter.jpg"）を指定できます。空ならイニシャルを表示します。
 window.PRESENTER = {
   name: "Mao Kano",
