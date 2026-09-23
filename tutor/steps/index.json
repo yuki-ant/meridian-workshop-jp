@@ -1,0 +1,239 @@
+{
+  "title": "Meridian ワークショップ — RFP への応札から最初の納品まで",
+  "budgetMinutes": 90,
+  "parts": [
+    {
+      "id": "p1",
+      "title": "第1幕 · RFP に応札する（提案書づくり）",
+      "minutes": 30
+    },
+    {
+      "id": "p2",
+      "title": "第2幕 · 受注した案件を遂行する（概要ページの不具合の修正、コードレビュー）",
+      "minutes": 51
+    }
+  ],
+  "steps": [
+    {
+      "id": "00-welcome",
+      "part": "p1",
+      "minutes": 3,
+      "title": "ようこそ · 環境の確認と「いまどこ？」",
+      "where": "cli",
+      "page": "map.html",
+      "hint": "このタブは開いたままにしてください。ターミナルに戻り、Claude の案内に沿って進めます。",
+      "checks": [
+        [
+          "env"
+        ],
+        [
+          "repoReady"
+        ]
+      ]
+    },
+    {
+      "id": "01-page-rfp",
+      "part": "p1",
+      "minutes": 4,
+      "title": "読む: RFP とは · 一般的な流れと、応札側が考えること",
+      "where": "browser",
+      "page": "01-rfp-process.html",
+      "hint": "RFP の一般的な解説ページです。読み終えたら、ターミナルに戻って「Done」（または「読みました」「Next Step」）と送ってください。",
+      "checks": []
+    },
+    {
+      "id": "02-kickoff",
+      "part": "p1",
+      "minutes": 4,
+      "title": "RFP を読む · @ で読み込み、私たちの理解を整理する",
+      "where": "cli",
+      "hint": "@docs/rfp/MC-2026-0417.md を自分で入力して RFP を読ませます。Claude の整理のあと、図にしたページが開きます。",
+      "checks": [
+        [
+          "noteSet",
+          "kickoff"
+        ]
+      ],
+      "page": "02-rfp-meridian.html"
+    },
+    {
+      "id": "03-analyze",
+      "part": "p1",
+      "minutes": 6,
+      "title": "穴を探す · 決めないと見積もれない点と、引き継ぎメモ",
+      "where": "cli",
+      "hint": "RFP の「穴」（曖昧な点）を一つ以上、自分の言葉で挙げてみてください。",
+      "checks": [
+        [
+          "noteSet",
+          "gaps"
+        ]
+      ]
+    },
+    {
+      "id": "04-proposal",
+      "part": "p1",
+      "minutes": 8,
+      "title": "提案の方針を決める · 提案書は Claude が一気に書く",
+      "where": "cli",
+      "hint": "選択肢が出たら、コンサルタントとして提案の方針を4つ選んでください。提案書の作文は Claude が一気にやります。",
+      "checks": [
+        [
+          "fileExists",
+          "proposal/proposal.md"
+        ],
+        [
+          "noteSet",
+          "decisions"
+        ]
+      ]
+    },
+    {
+      "id": "05-deck",
+      "part": "p1",
+      "minutes": 5,
+      "title": "HTML ページとスライドにする · 提案書を見せる形に",
+      "where": "cli",
+      "hint": "提案書の HTML ページとスライドが開いたら、ちゃんと表示されているかだけ確かめてください。細かい手直しは不要です。",
+      "checks": [
+        [
+          "fileExists",
+          "proposal/proposal.html"
+        ],
+        [
+          "fileExists",
+          "proposal/capabilities-deck.html"
+        ]
+      ]
+    },
+    {
+      "id": "06-env",
+      "part": "p2",
+      "minutes": 6,
+      "title": "受注 · 環境を確認し、/start でアプリを起動",
+      "where": "cli",
+      "hint": "/start は自分で入力します。起動したら http://localhost:3000 の概要ページで、期間や場所を切り替えて何が変わらないかを確かめてみましょう（RFP の R1）。",
+      "checks": [
+        [
+          "env"
+        ],
+        [
+          "portOpen",
+          8001,
+          "バックエンド"
+        ],
+        [
+          "portOpen",
+          3000,
+          "フロントエンド"
+        ],
+        [
+          "noteSet",
+          "reports_issue"
+        ]
+      ]
+    },
+    {
+      "id": "07-plan-r1",
+      "part": "p2",
+      "minutes": 6,
+      "title": "R1 の原因を調べて計画する · 概要ページで期間や場所を選んでも反映されない",
+      "where": "cli",
+      "hint": "Shift+Tab で Plan Mode に切り替えてから、RFP の R1 を Claude に渡します。原因と、直す範囲を確認します。",
+      "checks": [
+        [
+          "onFeatureBranch"
+        ],
+        [
+          "treeClean",
+          "client",
+          "server"
+        ],
+        [
+          "noteSet",
+          "r1_scope"
+        ]
+      ]
+    },
+    {
+      "id": "08-build-r1",
+      "part": "p2",
+      "minutes": 22,
+      "title": "R1 を直す · 概要ページの KPI をフィルターに連動させる",
+      "where": "cli",
+      "hint": "直ったら、期間や場所を切り替えて、上部の KPI が変わるかをブラウザで確かめます。",
+      "checks": [
+        [
+          "fileLacks",
+          "client/src/views/Dashboard.vue",
+          "fulfilled:\\s*187",
+          "固定値の出荷完了（187）"
+        ],
+        [
+          "fileLacks",
+          "client/src/views/Dashboard.vue",
+          "ref\\(\\s*96\\.8\\s*\\)",
+          "固定値の注文充足率（96.8）"
+        ],
+        [
+          "fileLacks",
+          "client/src/views/Dashboard.vue",
+          "kpi-value\">\\s*4\\.2\\s*<",
+          "直書きの在庫回転率（4.2）"
+        ],
+        [
+          "fileLacks",
+          "client/src/views/Dashboard.vue",
+          "kpi-value\">\\s*2\\.8\\s*<",
+          "直書きの平均処理時間（2.8）"
+        ],
+        [
+          "commitTouches",
+          "client/src/views/Dashboard.vue"
+        ],
+        [
+          "treeClean",
+          "client",
+          "server"
+        ]
+      ]
+    },
+    {
+      "id": "09-review",
+      "part": "p2",
+      "minutes": 10,
+      "title": "コードレビュー · サブエージェントの指摘を選んで直す",
+      "where": "cli",
+      "hint": "レビュー結果から、直す指摘を選びます。直さないものは次フェーズの引き継ぎメモに回します。",
+      "checks": [
+        [
+          "noteSet",
+          "review"
+        ],
+        [
+          "noteSet",
+          "review_findings"
+        ],
+        [
+          "treeClean",
+          "client",
+          "server"
+        ]
+      ]
+    },
+    {
+      "id": "10-wrap",
+      "part": "p2",
+      "minutes": 7,
+      "title": "まとめ · 進捗レポート（次フェーズへの引き継ぎつき）",
+      "where": "cli",
+      "hint": "進捗レポートがブラウザで開きます。今日の成果、予定と実績、次フェーズへの引き継ぎがまとまっています。",
+      "checks": [
+        [
+          "fileExists",
+          "proposal/progress-report.html"
+        ]
+      ]
+    }
+  ]
+}

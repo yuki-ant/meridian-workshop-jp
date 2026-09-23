@@ -1,0 +1,359 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>いまどこ？</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap"
+    />
+    <link rel="stylesheet" href="assets/page.css" />
+    <style>
+      .parts {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px;
+      }
+      @media (max-width: 820px) {
+        .parts {
+          grid-template-columns: 1fr;
+        }
+      }
+      .step {
+        display: flex;
+        gap: 10px;
+        align-items: baseline;
+        padding: 7px 10px;
+        border-radius: 9px;
+        font-size: 15px;
+      }
+      .step .n {
+        font:
+          12px ui-monospace,
+          Menlo,
+          monospace;
+        color: var(--gray);
+        width: 22px;
+        flex: none;
+      }
+      .step .m {
+        margin-left: auto;
+        font:
+          12px ui-monospace,
+          Menlo,
+          monospace;
+        color: var(--gray);
+        white-space: nowrap;
+      }
+      .step.done {
+        color: #5a5952;
+      }
+      .step.done .t::before {
+        content: "✓ ";
+        color: var(--mineral);
+        font-weight: 700;
+      }
+      .step.current {
+        background: var(--slate);
+        color: #fff;
+      }
+      .step.current .n,
+      .step.current .m {
+        color: #c9c7be;
+      }
+      .step.current .t::before {
+        content: "▶ ";
+        color: var(--clay);
+      }
+      .step a {
+        color: inherit;
+      }
+      .bar {
+        height: 8px;
+        background: var(--tint);
+        border-radius: 6px;
+        overflow: hidden;
+        margin: 6px 0 8px;
+      }
+      .bar i {
+        display: block;
+        height: 100%;
+        background: var(--clay);
+        transition: width 0.6s ease;
+      }
+      .clock {
+        position: relative;
+        height: 26px;
+        background: var(--tint);
+        border-radius: 8px;
+        margin: 8px 0 6px;
+        overflow: hidden;
+      }
+      .clock .used {
+        position: absolute;
+        inset: 0 auto 0 0;
+        background: #6a9bcc55;
+        transition: width 0.6s ease;
+      }
+      .clock .used.late {
+        background: #d9775766;
+      }
+      .clock .plan {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: var(--slate);
+        transition: left 0.6s ease;
+      }
+      .clock .lbl {
+        position: absolute;
+        right: 10px;
+        top: 4px;
+        font:
+          12px ui-monospace,
+          Menlo,
+          monospace;
+        color: var(--gray);
+      }
+      .legend {
+        font-size: 13px;
+        color: var(--gray);
+        margin-bottom: 22px;
+      }
+      .legend b {
+        color: var(--slate);
+        font-weight: 600;
+      }
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+        margin: 18px 0 6px;
+      }
+      @media (max-width: 720px) {
+        .stats {
+          grid-template-columns: 1fr;
+        }
+      }
+      .stat {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 14px 18px;
+      }
+      .stat .k {
+        font-size: 12px;
+        color: var(--gray);
+        letter-spacing: 0.06em;
+      }
+      .stat .v {
+        font-size: 26px;
+        font-weight: 700;
+      }
+      .hint {
+        border-left: 4px solid var(--clay);
+        background: #fff;
+        border-radius: 0 12px 12px 0;
+        padding: 14px 18px;
+        margin: 18px 0 22px;
+        box-shadow: 0 1px 0 rgba(31, 30, 29, 0.06);
+      }
+      .hint b {
+        display: block;
+        font-size: 12px;
+        letter-spacing: 0.08em;
+        color: #a5482b;
+        margin-bottom: 4px;
+      }
+      .hint span {
+        font-size: 17px;
+      }
+      .off {
+        color: var(--gray);
+        font-size: 14px;
+      }
+    </style>
+  </head>
+  <body>
+    <main style="max-width: 1040px">
+      <div class="kicker">
+        ライブ · 自動で更新されます · このタブは開いたままに ·
+        <a href="index.html" style="color: inherit">ページ一覧</a>
+      </div>
+      <h1>いまどこ？</h1>
+      <p class="lede" id="sub">ワークショップの状態を読み込んでいます…</p>
+      <div class="bar"><i id="bar" style="width: 0%"></i></div>
+
+      <div class="stats">
+        <div class="stat">
+          <div class="k">経過時間</div>
+          <div class="v" id="elapsed">—</div>
+        </div>
+        <div class="stat">
+          <div class="k">いまのステップの予定終了</div>
+          <div class="v" id="planned">—</div>
+        </div>
+        <div class="stat">
+          <div class="k">ペース</div>
+          <div class="v" id="pace">—</div>
+        </div>
+      </div>
+      <div class="clock" title="90分の予算">
+        <div class="used" id="used" style="width: 0%"></div>
+        <div class="plan" id="plan" style="left: 0%"></div>
+        <span class="lbl" id="clockLbl"></span>
+      </div>
+      <p class="legend">
+        帯 = 経過時間 · <b>縦線</b> = いまのステップを予定どおり終えたときの時刻
+        · 右端 = 予算 90 分
+      </p>
+
+      <div class="hint" id="hintWrap" style="display: none">
+        <b>いまやること</b><span id="hintText"></span>
+      </div>
+
+      <div id="reportWrap" class="card dark" style="display: none">
+        <b>進捗レポートができました。</b>
+        <p class="muted" style="margin-top: 6px">
+          今日の成果、予定と実績、次フェーズへの引き継ぎ。あなた自身の実行記録から作りました。
+          <a href="/proposal/progress-report.html" target="_blank" style="color: #e8a48c">レポートを開く →</a>
+        </p>
+      </div>
+
+      <div id="delivWrap" style="display: none">
+        <h2>あなたの成果物</h2>
+        <div class="card" id="deliv"></div>
+      </div>
+
+      <h2>全体マップ</h2>
+      <div class="parts" id="parts"></div>
+      <p class="off" id="off"></p>
+    </main>
+    <script>
+      function el(tag, cls, text) {
+        const e = document.createElement(tag);
+        if (cls) e.className = cls;
+        if (text != null) e.textContent = text;
+        return e;
+      }
+      function hhmm(iso) {
+        const d = new Date(iso);
+        return (
+          String(d.getHours()).padStart(2, "0") +
+          ":" +
+          String(d.getMinutes()).padStart(2, "0")
+        );
+      }
+      async function tick() {
+        try {
+          const s = await (
+            await fetch("/state.json", { cache: "no-store" })
+          ).json();
+          document.getElementById("off").textContent = "";
+          const N = s.steps.length;
+          const done = s.steps.filter((x) => x.status === "done").length;
+          const cur = s.finishedAt
+            ? null
+            : s.steps.find((x) => x.id === s.current);
+          const pct = cur ? Math.round((100 * done) / Math.max(1, N)) : 100;
+          document.getElementById("sub").textContent = cur
+            ? `ステップ ${String(cur.n).padStart(2, "0")} · ${cur.title} · ${done} / ${N} 完了（${pct}%）`
+            : `完了 · 全 ${N} ステップが終わりました（100%）`;
+          document.getElementById("bar").style.width = pct + "%";
+
+          // the clock: elapsed time against the 90-minute budget, with a marker where the plan expects the current step to end
+          const budget = s.budgetMinutes || 90,
+            el_ = s.elapsedMin || 0;
+          // late = past the planned end of the current step; early = still before its planned start
+          const late = !cur ? 0 : el_ > s.plannedUntilNow + 2 ? el_ - s.plannedUntilNow : el_ < s.plannedBeforeNow - 5 ? el_ - s.plannedBeforeNow : 0;
+          document.getElementById("elapsed").textContent = s.startedAt
+            ? `${el_} 分`
+            : "—";
+          document.getElementById("planned").textContent = cur
+            ? `${s.plannedUntilNow} 分`
+            : "—";
+          document.getElementById("pace").textContent =
+            !s.startedAt || !cur
+              ? s.finishedAt
+                ? "完了"
+                : "—"
+              : late > 0
+                ? `約 ${late} 分遅れ`
+                : late < 0
+                  ? `約 ${-late} 分先行`
+                  : "予定どおり";
+          const used = document.getElementById("used");
+          used.style.width = Math.min(100, (100 * el_) / budget) + "%";
+          used.classList.toggle("late", el_ > budget || late > 0);
+          document.getElementById("plan").style.left =
+            Math.min(
+              100,
+              (100 * (cur ? s.plannedUntilNow : s.totalMinutes)) / budget,
+            ) + "%";
+          document.getElementById("clockLbl").textContent =
+            `${el_} / ${budget} 分`;
+
+          document.getElementById("hintWrap").style.display = s.hint
+            ? ""
+            : "none";
+          if (s.hint) document.getElementById("hintText").textContent = s.hint;
+
+          // the learner's own HTML deliverables under proposal/, served by this same page server
+          const dl = s.deliverables || [];
+          document.getElementById("reportWrap").style.display = dl.some((f) => f.name === "progress-report.html") ? "" : "none";
+          document.getElementById("delivWrap").style.display = dl.length ? "" : "none";
+          const dv = document.getElementById("deliv");
+          dv.innerHTML = "";
+          for (const f of dl) {
+            const a = el("a", null, f.name);
+            a.href = f.url;
+            a.target = "_blank";
+            const row = el("div", "step");
+            row.appendChild(a);
+            row.appendChild(el("span", "m", f.kind === "md" ? "Markdown → 表示用に整形" : "HTML"));
+            dv.appendChild(row);
+          }
+
+          const parts = document.getElementById("parts");
+          parts.innerHTML = "";
+          for (const p of s.parts) {
+            const box = el("div", "card");
+            const h = el("b", null, p.title);
+            box.appendChild(h);
+            box.appendChild(el("span", "muted", ` · 約 ${p.minutes} 分`));
+            for (const st of s.steps.filter((x) => x.part === p.id)) {
+              const row = el("div", "step " + st.status);
+              row.appendChild(el("span", "n", String(st.n).padStart(2, "0")));
+              const t = el("span", "t");
+              if (st.where === "browser" && st.page) {
+                const a = el("a", null, st.title);
+                a.href = st.page;
+                t.appendChild(a);
+              } else t.textContent = st.title;
+              row.appendChild(t);
+              row.appendChild(
+                el(
+                  "span",
+                  "m",
+                  (st.where === "browser" ? "ブラウザ · " : "") +
+                    `${st.minutes} 分` +
+                    (st.doneAt ? ` · ${hhmm(st.doneAt)} 完了` : ""),
+                ),
+              );
+              box.appendChild(row);
+            }
+            parts.appendChild(box);
+          }
+        } catch (e) {
+          document.getElementById("off").textContent =
+            "ページサーバーが応答していません。ターミナルで Claude に「node tutor/bin/tutor.mjs serve を実行して」と頼んでください。";
+        }
+      }
+      tick();
+      setInterval(tick, 2500);
+    </script>
+  </body>
+</html>

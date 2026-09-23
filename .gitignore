@@ -52,3 +52,6 @@ logs/
 
 # Environment variables
 .env
+
+# Tutor progress (per learner)
+tutor/state/
