@@ -109,6 +109,33 @@ function load() {
       s.seen = s.seen.map(r);
       s.idsV4 = true;
     }
+    // The introduction deck became step 01, so every later step moved up by one. A learner who was already past the
+    // welcome keeps their place: the new step counts as read, so the map shows no hole behind them.
+    if (!s.idsV5) {
+      const ren = {
+        "01-page-rfp": "02-page-rfp",
+        "02-kickoff": "03-kickoff",
+        "03-analyze": "04-analyze",
+        "04-proposal": "05-proposal",
+        "05-deck": "06-deck",
+        "06-env": "07-env",
+        "07-plan-r1": "08-plan-r1",
+        "08-build-r1": "09-build-r1",
+        "09-review": "10-review",
+        "10-wrap": "11-wrap",
+      };
+      const r = (id) => ren[id] || id;
+      s.step = r(s.step);
+      s.done.forEach((d) => {
+        d.id = r(d.id);
+      });
+      s.seen = s.seen.map(r);
+      const welcome = s.done.find((d) => d.id === "00-welcome");
+      if (welcome && !s.done.some((d) => d.id === "01-intro-deck")) {
+        s.done.splice(s.done.indexOf(welcome) + 1, 0, { ...welcome, id: "01-intro-deck" });
+      }
+      s.idsV5 = true;
+    }
     return s;
   } catch {
     return {
@@ -122,6 +149,7 @@ function load() {
       idsV2: true,
       idsV3: true,
       idsV4: true,
+      idsV5: true,
     };
   }
 }
