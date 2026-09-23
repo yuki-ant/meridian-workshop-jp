@@ -215,6 +215,14 @@
         <b>いまやること</b><span id="hintText"></span>
       </div>
 
+      <div id="reportWrap" class="card dark" style="display: none">
+        <b>進捗レポートができました。</b>
+        <p class="muted" style="margin-top: 6px">
+          今日の成果、予定と実績、次フェーズへの引き継ぎ。あなた自身の実行記録から作りました。
+          <a href="/proposal/progress-report.html" target="_blank" style="color: #e8a48c">レポートを開く →</a>
+        </p>
+      </div>
+
       <div id="delivWrap" style="display: none">
         <h2>あなたの成果物</h2>
         <div class="card" id="deliv"></div>
@@ -295,6 +303,7 @@
 
           // the learner's own HTML deliverables under proposal/, served by this same page server
           const dl = s.deliverables || [];
+          document.getElementById("reportWrap").style.display = dl.some((f) => f.name === "progress-report.html") ? "" : "none";
           document.getElementById("delivWrap").style.display = dl.length ? "" : "none";
           const dv = document.getElementById("deliv");
           dv.innerHTML = "";

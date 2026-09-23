@@ -230,13 +230,13 @@
       "id": "10-wrap",
       "part": "p2",
       "minutes": 5,
-      "title": "まとめ · 進捗報告と次フェーズへの引き継ぎ",
+      "title": "まとめ · 進捗レポート（次フェーズへの引き継ぎつき）",
       "where": "cli",
-      "hint": "引き継ぎメモができたら、「あなたの成果物」から開いてブラウザで読めます。",
+      "hint": "進捗レポートがブラウザで開きます。今日の成果、予定と実績、次フェーズへの引き継ぎがまとまっています。",
       "checks": [
         [
           "fileExists",
-          "proposal/next-phase.md"
+          "proposal/progress-report.html"
         ]
       ]
     }

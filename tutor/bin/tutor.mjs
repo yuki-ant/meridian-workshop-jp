@@ -12,6 +12,8 @@
 //   tutor note key=value …     remember something the learner said or decided
 //   tutor serve [--stop]       start / stop the local page server (http://localhost:8766)
 //   tutor open <page>          print the page's URL and try to open it in the browser
+//   tutor report-data          everything the Progress Report needs, as JSON
+//   tutor report               build proposal/progress-report.html from the run plus tutor/state/story.json, and open it
 //   tutor stop-all             stop the page server and the app (ports 3000 / 8001)
 //   tutor reset                forget all progress (reset-demo.sh calls this)
 
@@ -908,6 +910,56 @@ function openInBrowser(url) {
   }
 }
 // Late = past the planned END of the current step; early = still before its planned START. Time inside the step is on plan.
+// ── the closing Progress Report ──────────────────────────────────────────────
+// Numbers come from the recorded run (reportData); Claude adds only the narrative, as tutor/state/story.json.
+// The template (tutor/assets/report/template.html) is adapted from the todo-app tutor's report.
+const STORY = path.join(STATE_DIR, "story.json");
+const REPORT = path.join(PROPOSAL_DIR, "progress-report.html");
+function backendTests() {
+  const r = sh("uv", ["run", "--project", "../server", "pytest", "-q", "-p", "no:cacheprovider"], { cwd: path.join(ROOT, "tests"), timeout: 120000 });
+  const line = (r.all.match(/^=+ (.*(?:passed|failed).*) =+$/m) || [])[1] || "";
+  const n = (w) => Number((line.match(new RegExp(`(\\d+) ${w}`)) || [])[1] || 0);
+  return line ? { passed: n("passed"), failed: n("failed"), baselineFailed: 2 } : {};
+}
+function reportData() {
+  const s = load();
+  const events = fs.existsSync(LOG) ? fs.readFileSync(LOG, "utf8").trim().split("\n").map((l) => { try { return JSON.parse(l); } catch { return null; } }).filter(Boolean) : [];
+  const forced = new Set(events.filter((e) => e.ev === "done" && e.forced).map((e) => e.step));
+  // actual time per step: a step starts when the previous one was completed (the first one when the learner began)
+  let prev = s.startedAt ? Date.parse(s.startedAt) : null;
+  const timeline = [...s.done].sort((a, b) => Date.parse(a.at) - Date.parse(b.at)).filter((d) => STEPS.some((x) => x.id === d.id)).map((d) => {
+    const st = STEPS[stepIndex(d.id)];
+    const end = Date.parse(d.at);
+    const row = { id: d.id, title: st.title, plannedMinutes: st.minutes, startedAt: prev ? new Date(prev).toISOString() : null, endedAt: d.at, actualMinutes: prev ? Math.round((end - prev) / 6000) / 10 : null, forced: forced.has(d.id) };
+    prev = end;
+    return row;
+  });
+  const commits = git("log", "--reverse", "--format=%h%x09%s", "tutor-base..HEAD", "--", "client", "server").out.trim().split("\n").filter(Boolean).map((l) => { const [hash, subject] = l.split("\t"); return { hash, subject }; });
+  const stat = git("diff", "--stat", "tutor-base..HEAD", "--", "client", "server").out.trim().split("\n").slice(-1)[0].trim();
+  const st = publicState();
+  return {
+    generatedAt: now(), timeline, tests: backendTests(), deliverables: st.deliverables,
+    state: { ...st, notes: s.notes, budgetMinutes: INDEX.budgetMinutes || 90 },
+    git: { commits, stat },
+  };
+}
+async function buildReport() {
+  let story = {};
+  if (fs.existsSync(STORY)) {
+    try { story = JSON.parse(fs.readFileSync(STORY, "utf8")); }
+    catch (e) { console.log(`tutor/state/story.json が JSON として読めません（${e.message}）。物語なしで作ります。ファイルを直してもう一度実行してください。`); }
+  } else console.log("tutor/state/story.json はまだありません。記録された数字だけで作ります。物語を書いてからもう一度実行してください。");
+  const embed = (o) => JSON.stringify(o).replace(/</g, "\\u003c"); // never let a note close the script block
+  const html = fs.readFileSync(path.join(PLUGIN, "assets", "report", "template.html"), "utf8").replace("__DATA__", () => embed(reportData())).replace("__STORY__", () => embed(story));
+  fs.mkdirSync(PROPOSAL_DIR, { recursive: true });
+  fs.writeFileSync(REPORT, html);
+  log("report", { story: Object.keys(story) });
+  const ok = await ensureServer();
+  const url = ok ? `http://localhost:${PORT}/proposal/progress-report.html` : `file://${REPORT}`;
+  if (!process.env.TUTOR_NO_OPEN) openInBrowser(url);
+  console.log(`進捗レポートを書き出し、ブラウザで開きます:\n${url}\n（ファイルは ${REPORT}。「いまどこ？」ページの「あなたの成果物」からも開けます）`);
+}
+
 function paceLine(s) {
   if (s.finishedAt) return "";
   const el = elapsedMin(s),
@@ -1129,6 +1181,12 @@ switch (cmd) {
     console.log(out.join("\n"));
     break;
   }
+  case "report-data":
+    console.log(JSON.stringify(reportData(), null, 2));
+    break;
+  case "report":
+    await buildReport();
+    break;
   case "reset":
     fs.rmSync(STATE_DIR, { recursive: true, force: true });
     console.log("ワークショップの進捗を消去しました");
