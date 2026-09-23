@@ -10,7 +10,7 @@ YOU DO
 [PASTE BLOCK]
 code-reviewer サブエージェントで、tutor-base から今までの変更（git diff tutor-base..HEAD の client/ と server/）をレビューしてください。
 
-2. Agent ツールで code-reviewer サブエージェントを呼ぶ（subagent_type: code-reviewer）。渡すのは、対象のファイル、今日の範囲（A と B）、範囲外にした項目（発注書機能、Reports の金額表示・i18n、Composition API への移行など）。範囲外の指摘は「次フェーズ」に分ける、と頼む。
+2. Agent ツールで code-reviewer サブエージェントを呼ぶ（subagent_type: code-reviewer）。渡すのは、対象のファイル、今日の範囲（A と B）、範囲外にした項目（Reports ページ、発注書機能、Composition API への移行など）。範囲外の指摘は「次フェーズ」に分ける、と頼む。
 3. 結果は全文を貼らず、重要度別（🔴 直すべき／🟡 できれば／🟢 参考）に1行ずつ、多くて6件にまとめる。
 4. AskUserQuestion（multiSelect）で、どれを直すかを参加者に選んでもらう。🔴 は推奨として先頭に置く。直さないものは引き継ぎメモに回す、と伝える。
 5. 選ばれた指摘を直す。再確認は軽くでよい: バックエンドを変えたならテストを実行し、画面に効く修正ならブラウザで一目見てもらう。

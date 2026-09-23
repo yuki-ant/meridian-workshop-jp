@@ -9,7 +9,7 @@
     },
     {
       "id": "p2",
-      "title": "第2幕 · 受注した案件を遂行する（概要と Reports の改修、コードレビュー）",
+      "title": "第2幕 · 受注した案件を遂行する（概要ページの不具合の修正、コードレビュー）",
       "minutes": 49
     }
   ],
@@ -112,7 +112,7 @@
       "minutes": 6,
       "title": "受注 · 環境を確認し、/start でアプリを起動",
       "where": "cli",
-      "hint": "/start は自分で入力します。起動したら http://localhost:3000 を開き、概要ページと Reports ページで気になるところを探してみましょう。",
+      "hint": "/start は自分で入力します。起動したら http://localhost:3000 の概要ページで、期間や場所を切り替えて何が変わらないかを確かめてみましょう。",
       "checks": [
         [
           "env"
@@ -137,9 +137,9 @@
       "id": "07-plan-r1",
       "part": "p2",
       "minutes": 6,
-      "title": "改修の範囲を決める · ブランチと Plan Mode",
+      "title": "原因を調べて計画する · 「概要ページで期間や場所を選んでも反映されない」",
       "where": "cli",
-      "hint": "Shift+Tab で Plan Mode に切り替えてから、Claude の計画を読みます。範囲は A: 概要ページ と B: Reports のフィルター。",
+      "hint": "Shift+Tab で Plan Mode に切り替えてから、クライアントの報告を Claude に渡します。原因と、直す範囲を確認します。",
       "checks": [
         [
           "onFeatureBranch"
@@ -159,47 +159,37 @@
       "id": "08-build-r1",
       "part": "p2",
       "minutes": 22,
-      "title": "実装する · A 概要ページ → B Reports のフィルター",
+      "title": "直す · 概要ページの KPI をフィルターに連動させる",
       "where": "cli",
-      "hint": "A のあとは日本語表示のボタンとタスクの保存、B のあとはフィルターで Reports の数字が変わるかを、ブラウザで確かめます。",
+      "hint": "直ったら、期間や場所を切り替えて、上部の KPI が変わるかをブラウザで確かめます。",
       "checks": [
         [
           "fileLacks",
           "client/src/views/Dashboard.vue",
-          "(Create|View) PO",
-          "英語のままの「Create PO」「View PO」"
+          "fulfilled:\\s*187",
+          "固定値の出荷完了（187）"
         ],
         [
-          "fileContains",
-          "server/main.py",
-          "/api/tasks",
-          "/api/tasks の実装"
+          "fileLacks",
+          "client/src/views/Dashboard.vue",
+          "ref\\(\\s*96\\.8\\s*\\)",
+          "固定値の注文充足率（96.8）"
         ],
         [
-          "fileContains",
-          "client/src/views/Reports.vue",
-          "useFilters",
-          "useFilters の利用"
+          "fileLacks",
+          "client/src/views/Dashboard.vue",
+          "kpi-value\">\\s*4\\.2\\s*<",
+          "直書きの在庫回転率（4.2）"
         ],
         [
-          "fileContains",
-          "client/src/views/Reports.vue",
-          "watch(Effect)?\\s*\\(",
-          "フィルター変更の watch"
-        ],
-        [
-          "fileContains",
-          "client/src/api.js",
-          "reports/(quarterly|monthly-trends)",
-          "api.js への reports エンドポイント登録"
+          "fileLacks",
+          "client/src/views/Dashboard.vue",
+          "kpi-value\">\\s*2\\.8\\s*<",
+          "直書きの平均処理時間（2.8）"
         ],
         [
           "commitTouches",
           "client/src/views/Dashboard.vue"
-        ],
-        [
-          "commitTouches",
-          "client/src/views/Reports.vue"
         ],
         [
           "treeClean",
