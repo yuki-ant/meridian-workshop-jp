@@ -417,10 +417,11 @@ function Slide_App() {
 }
 
 /* ── Live map and progress report: captures of the real pages, fed with one sample run ── */
-function Shot({ src, url, alt, flex, size, pins, bg, bare, fit }) {
+function Shot({ src, url, alt, flex, size, pins, bg, bare, fit, block }) {
   // The image always fills the frame's width. `size` is the image's own width / height: with it, `pins` (x and y in
   // percent of the whole image) stay on their spot at any frame size. `bare` drops the browser bar and sizes the frame
-  // to the image. `fit` keeps the browser bar but lets the frame take the image's height instead of the column's.
+  // to the image. `fit` keeps the browser bar but lets the frame take the image's height instead of the column's
+  // (in a row of shots); `block` does the same for a shot stacked in a column, where it takes the column's full width.
   const body = (
     <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', aspectRatio: String(size) }}>
       <img src={src} alt={alt} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: 'auto', display: 'block' }} />
@@ -431,12 +432,12 @@ function Shot({ src, url, alt, flex, size, pins, bg, bare, fit }) {
     return <div style={{ position: 'relative', flex: '0 0 auto', width: '100%', aspectRatio: String(size), background: bg || '#fff', border: `1px solid ${C.LINE}`, borderRadius: 10, overflow: 'hidden', boxShadow: '0 6px 18px rgba(20,20,19,0.08)' }}>{body}</div>;
   }
   return (
-    <div style={{ flex: flex || 1, minHeight: 0, minWidth: 0, alignSelf: fit ? 'flex-start' : 'stretch', display: 'flex', flexDirection: 'column', background: bg || '#fff', border: `1px solid ${C.LINE}`, borderRadius: 12, overflow: 'hidden', boxShadow: '0 10px 28px rgba(20,20,19,0.10)' }}>
+    <div style={{ flex: block ? '0 0 auto' : (flex || 1), minHeight: 0, minWidth: 0, alignSelf: fit && !block ? 'flex-start' : 'stretch', display: 'flex', flexDirection: 'column', background: bg || '#fff', border: `1px solid ${C.LINE}`, borderRadius: 12, overflow: 'hidden', boxShadow: '0 10px 28px rgba(20,20,19,0.10)' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, background: C.TINT, padding: '6px 12px', fontFamily: MONO, fontSize: 12, color: C.GRAY, flex: '0 0 auto' }}>
         <span style={{ width: 8, height: 8, borderRadius: 4, background: '#D9CFC0' }} /><span style={{ width: 8, height: 8, borderRadius: 4, background: '#D9CFC0' }} /><span style={{ width: 8, height: 8, borderRadius: 4, background: '#D9CFC0', marginRight: 6 }} />
         <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{url}</span>
       </div>
-      <div style={fit ? { position: 'relative', aspectRatio: String(size), overflow: 'hidden' } : { flex: 1, minHeight: 0, position: 'relative', overflow: 'hidden' }}>{body}</div>
+      <div style={fit || block ? { position: 'relative', aspectRatio: String(size), overflow: 'hidden' } : { flex: 1, minHeight: 0, position: 'relative', overflow: 'hidden' }}>{body}</div>
     </div>
   );
 }
@@ -452,17 +453,30 @@ function Callout({ n, c, title, children }) {
   );
 }
 function Slide_Map() {
+  const mini = (n, title, text) => (
+    <div style={{ flex: 1, minWidth: 0, display: 'flex', gap: 9, alignItems: 'flex-start' }}>
+      <span style={{ position: 'relative', top: 1, display: 'inline-flex' }}><Pin n={n} size={20} /></span>
+      <div style={{ minWidth: 0 }}>
+        <div style={{ fontSize: 15, fontWeight: 700, lineHeight: 1.35, color: C.SLATE }}>{title}</div>
+        <div style={{ fontSize: 12.5, lineHeight: 1.5, color: C.INK }}>{text}</div>
+      </div>
+    </div>
+  );
   return (
     <Slide label="Live map" padding="40px 72px 56px">
       <Head kicker="途中で" h2={ph('「いまどこ？」ページが、', '現在地とペースを示し続ける')} />
       <div style={{ display: 'flex', gap: 26, flex: 1, minHeight: 0 }}>
-        <Shot fit flex={1.25} src="assets/map-top.png" size={1300 / 910} url="localhost:8766/map.html" alt="ステップ 09 の時点の「いまどこ？」ページの上半分。現在のステップ、経過時間、予定終了、ペース、90 分の予算の帯、いまやること" pins={[{ n: 1, x: 22, y: 30.4 }, { n: 2, x: 67.5, y: 63.8 }, { n: 3, x: 42, y: 80.6 }]} />
-        <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 11 }}>
-          <Callout n={1} title="現在地が 1 行でわかる">いまのステップと、完了した数。このタブは開いたままにします。</Callout>
-          <Callout n={2} title="90 分の予算とペース">帯が経過時間、縦線がいまのステップの予定終了。遅れたら、Claude が次を短めに運びます。</Callout>
-          <Callout n={3} title="いまやること">ターミナルに戻らなくても、次の一手がわかります。</Callout>
-          <Shot bare src="assets/map-act2.png" size={1100 / 480} alt="同じページの下にある全体マップの第2幕。終わったステップにはチェックと完了時刻が付き、いまのステップは黒い帯で示される" pins={[{ n: 4, x: 66, y: 24.5 }]} />
-          <Callout n={4} title="全体マップ">チェックは、Claude が完了を確かめた時点で付きます。</Callout>
+        <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <Shot block src="assets/map-top.png" size={1300 / 855} url="localhost:8766/map.html · このタブは開いたままに" alt="ステップ 09 の時点の「いまどこ？」ページの上半分。現在のステップ、経過時間、予定終了、ペース、90 分の予算の帯、いまやること" pins={[{ n: 1, x: 22, y: 32.4 }, { n: 2, x: 67.5, y: 67.8 }, { n: 3, x: 42, y: 85.8 }]} />
+          <div style={{ display: 'flex', gap: 14 }}>
+            {mini(1, '現在地', 'いまのステップと、完了した数')}
+            {mini(2, '90 分の予算とペース', '帯が経過時間、縦線が予定終了')}
+            {mini(3, 'いまやること', '次の一手がわかります')}
+          </div>
+        </div>
+        <div style={{ flex: '0 0 462px', minWidth: 0, display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <Shot bare src="assets/map-steps.png" size={1100 / 1103} alt="同じページの下にある全体マップ。第1幕の 7 ステップと第2幕の 5 ステップがすべて並び、終わったステップにはチェックと完了時刻が付き、いまのステップは黒い帯で示される" pins={[{ n: 4, x: 72, y: 6.2 }]} />
+          {mini(4, '全体マップ：12 ステップすべて', 'チェックは、Claude が完了を確かめた時点で付きます')}
         </div>
       </div>
     </Slide>
@@ -618,8 +632,8 @@ const SLIDES = [
   { c: Slide_How, title: 'Claude が 1 ステップずつ案内し、あなたが判断して手を動かす', notes: '進み方は、いつも同じです。Claude が次にやることと目安の時間を伝えます。短いページを読むこともあります。読み終えたり、作業が終わったりしたら、ターミナルに戻って「Done」と送ります。「できました」でも構いません。スラッシュコマンド、Shift+Tab、@ によるファイル参照、許可の確認は、あなたにしか入力できないので、Claude は何を入力するかを伝えて待ちます。そのあと Claude が、リポジトリの状態と記録を見て、そのステップの完了条件が満たされているかを確かめます。読むだけのステップは、「Done」でそのまま進みます。[ターミナル、ページ、緑の囲みの順に指す]' },
   { c: Slide_Case, title: 'あなたはコンサルタント。Meridian Components から RFP が届いた', notes: 'あなたの役は、RFP に応札するコンサルタントです。クライアントは Meridian Components。産業用オートメーション部品のディストリビューターで、倉庫はサンフランシスコ、ロンドン、東京にあります。依頼は、在庫管理ダッシュボードのモダナイズと機能拡張です。必須項目は R1 から R5 までで、優先順位順に並んでいます。最優先の R1 が、今日の第2幕で直すものです。手元には、RFP の本体、自社でまとめた背景メモ、前任ベンダーの引き継ぎメモ、そしてソースコードがあります。エンジニアでなくても進められます。決めるのはあなたで、提案書の文章とコードは Claude が書きます。' },
   { c: Slide_Agenda, title: '応札する第1幕、納品する第2幕、最後に進捗レポート', notes: '全体は 12 ステップです。第1幕は約 34 分。RFP とは何かを読み、実際の RFP を @ で読み込み、決めないと見積もれない点を探し、提案の方針を 4 つ決めます。提案書の文章は Claude が一気に書き、HTML のページとスライドにもします。第2幕は約 51 分。/start でアプリを起動して症状を確かめ、Plan Mode で原因を調べ、直してコミットし、サブエージェントのレビューから直す指摘を選びます。いちばん長いのは R1 を直すステップで、22 分です。最後に Claude が進捗レポートを作ります。合計は約 85 分で、5 分ほどの予備があります。色付きのラベルは、そのステップで初めて使う Claude Code の機能です。必要になったときに Claude が紹介します。' },
+  { c: Slide_Map, title: '「いまどこ？」ページが、現在地とペースを示し続ける', notes: '進行中の様子です。最初のステップで Claude がこのページをブラウザで開き、あとは自動で更新し続けます。タブは開いたままにしておいてください。1 番、いまのステップと完了した数。2 番、90 分の予算に対する経過時間の帯と、いまのステップを予定どおり終えたときの時刻を示す縦線。3 番、いまやること。4 番、右の画面が、同じページの下にある全体マップです。第1幕の 7 ステップと第2幕の 5 ステップ、あわせて 12 ステップがすべて並びます。チェックは「Done」と言った時点ではなく、Claude が完了を確かめた時点で付きます。画面は、サンプルのデータで表示した例です。' },
   { c: Slide_App, title: '最初に直すのは R1：概要ページの指標が、フィルターに連動しない', notes: '第2幕で手を入れるのが、このアプリです。Vue 3 と FastAPI の小さな在庫ダッシュボードで、データは JSON ファイル、データベースはありません。画面の上に期間や場所のフィルターがあり、その下に主要な指標が並びます。RFP には、フィルターを変えても指標が更新されない、と書かれています。ただし、書かれているのは症状だけです。どの数字が変わって、どれが変わらないのかは、アプリを起動して自分の目で確かめます。そのうえで Plan Mode で原因を調べ、直してコミットし、サブエージェントにレビューさせます。R2 から R5 は次のフェーズで、最後のレポートに引き継ぎとしてまとめます。[1 番のフィルター、2 番の指標の順に指す]' },
-  { c: Slide_Map, title: '「いまどこ？」ページが、現在地とペースを示し続ける', notes: '進行中の様子です。最初のステップで Claude がこのページをブラウザで開き、あとは自動で更新し続けます。タブは開いたままにしておいてください。1 番、いまのステップと完了した数。2 番、90 分の予算に対する経過時間の帯と、いまのステップを予定どおり終えたときの時刻を示す縦線。3 番、いまやること。4 番、同じページの下にある全体マップです。チェックは「Done」と言った時点ではなく、Claude が完了を確かめた時点で付きます。画面は、サンプルのデータで表示した例です。' },
   { c: Slide_Report, title: '今日の進捗を、レポートに自動でまとめる', notes: '終わったときの様子です。最後のステップで Claude にレポートを頼むと、数字はチューターが実行記録から埋め、文章は Claude が書いて、ブラウザで開きます。コンサルタントがクライアントと自社に渡す進捗レポートの形になっていて、今日の成果、予定と実績のタイムライン、提案書、納品したコミット、コードレビュー、判断と軌道修正、そして次フェーズへの引き継ぎが 1 ページにまとまります。画面は、サンプルのデータで表示した例です。' },
   { c: Slide_Keep, title: '作ったものは、リポジトリのファイルとコミットとして手元に残る', notes: 'ここで作るものは、どれもリポジトリの中の実際のファイルとコミットです。proposal フォルダーには、提案書と、その HTML ページとスライド、そして進捗レポートが入ります。コードの変更は、作業ブランチ fix/overview-filters のコミットとして残ります。概要ページを直したコミットと、レビューの指摘を直したコミットです。最後に、自分の fork に push して Pull Request を作るところまで、Claude が手伝います。' },
   { c: Slide_Help, title: '行き詰まっても、中断しても、続きから再開できる', notes: '行き詰まったら、そのまま Claude に伝えてください。足りないものを一緒に片付けるか、時間がなければ確認のうえで先へ進めます。中断したときは、start.sh をもう一度実行すれば同じステップに戻れます。進捗は tutor/state フォルダーに保存されています。最初からやり直すときは reset-demo.sh です。それまでの作業は退避用のブランチに残ります。' },
