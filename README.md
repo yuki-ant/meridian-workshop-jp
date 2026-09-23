@@ -14,6 +14,7 @@
 - **Claude Code**: [docs.claude.com/claude-code](https://docs.claude.com/en/docs/claude-code/overview)
 - **Node.js 18 以上**: [nodejs.org](https://nodejs.org)
 - **uv**（Python パッケージマネージャー）: `curl -LsSf https://astral.sh/uv/install.sh | sh`
+- **Python 3.11 以上**（第2幕でバックエンドが使います）
 - **git**
 
 ## 始め方
@@ -32,7 +33,7 @@ Claude が起動したら「こんにちは」と一声かけてください。�
 
 ## 講師の方へ
 
-紹介スライドは、会場で映して説明するのにも使えます。`node tutor/bin/tutor.mjs serve` でページサーバーだけを起動し、http://localhost:8766/intro/deck.html を開いてください（`tutor/pages/intro/deck.html` をブラウザで直接開いても動きます）。← → で移動、N で講師用ノート、F で全画面です。講師紹介のページは `tutor/pages/intro/presenter.js` を書き換えるだけで差し替えられます。スライド自体の直し方は `tutor/maint/intro-deck/README.md` にあります。
+紹介スライドは、会場で映して説明するのにも使えます。`node tutor/bin/tutor.mjs serve` でページサーバーだけを起動し、http://localhost:8766/intro/deck.html?present を開いてください（`tutor/pages/intro/deck.html` をブラウザで直接開いても動きます）。`?present` を付けると、タイトルの次に講師紹介のページが入ります（参加者が自分で読むときには出ません）。← → で移動、N で講師用ノート、F で全画面です。講師紹介の内容は `tutor/pages/intro/presenter.js` を書き換えるだけで差し替えられます。スライド自体の直し方は `tutor/maint/intro-deck/README.md` にあります。
 
 ## 途中で接続が切れてしまったら
 

@@ -11,6 +11,8 @@ const QS = new URLSearchParams(location.search);
 const IS_PRINT = QS.has('print');
 // ?static freezes every animation on its most telling frame (screenshots, print).
 const IS_STATIC = IS_PRINT || QS.has('static');
+// ?present adds the speaker page: for an instructor showing the deck to a room. A learner reading alone does not get it.
+const IS_PRESENT = QS.has('present');
 
 // Same palette and font stacks as tutor/pages/assets/page.css, so the deck reads as one of the workshop's pages.
 const C = {
@@ -33,7 +35,7 @@ function Slide({ bg = C.IVORY, color = C.SLATE, children, label, padding = '44px
         style={{
           position: 'absolute', top: '50%', left: '50%', width: CANVAS_W, height: CANVAS_H,
           transform: 'translate(-50%, -50%) scale(var(--deck-scale, 1))',
-          color, padding, display: 'flex', flexDirection: 'column', fontFamily: SANS, overflow: 'hidden',
+          color, padding, display: 'flex', flexDirection: 'column', fontFamily: SANS, overflow: 'hidden', lineBreak: 'strict',
           justifyContent: center ? 'center' : 'flex-start', alignItems: center ? 'center' : 'stretch',
         }}
       >

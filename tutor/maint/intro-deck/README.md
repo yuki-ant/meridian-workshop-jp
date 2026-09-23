@@ -7,7 +7,7 @@
 | `shell.jsx` | 小さなランタイム。1280×720 のキャンバスをウィンドウに合わせて拡大縮小し、キー操作、ページ番号、講師用ノート（N）、印刷表示（`?print`）を受け持つ。配色とフォントは `tutor/pages/assets/page.css` と同じ |
 | `slides.jsx` | 各ページと、講師用ノート（末尾の `SLIDES`） |
 | `build.mjs` | 上の2つを `tutor/pages/intro/deck.js` にコンパイルする |
-| `tutor/pages/intro/presenter.js` | 講師紹介ページの内容。**ここだけはビルド不要**で、書き換えればそのまま反映される。`name` を消すと講師紹介のページは出ない |
+| `tutor/pages/intro/presenter.js` | 講師紹介ページの内容。**ここだけはビルド不要**で、書き換えればそのまま反映される。このページが出るのは `deck.html?present` で開いたときだけ（参加者がステップ 01 で自分で読むときには出ない）。`name` を消すと `?present` でも出ない |
 
 ## スライドを直したら
 
@@ -21,7 +21,7 @@ node tutor/maint/intro-deck/build.mjs --check                                   
 
 `.jsx` と `deck.js` は必ず一緒にコミットしてください。`--check` は、ソースのハッシュと `deck.js` の先頭に記録されたハッシュを比べます。`--vendor` は React の本番ビルドを `tutor/pages/intro/vendor/` にコピーし直します（React を上げるときだけ）。
 
-表示の確認は `node tutor/bin/tutor.mjs serve` で http://localhost:8766/intro/deck.html を開きます。`?static` を付けるとアニメーションが止まり、`?print` で1ページ1枚の印刷表示（PDF 保存用）になります。
+表示の確認は `node tutor/bin/tutor.mjs serve` で http://localhost:8766/intro/deck.html を開きます。`?present` で講師紹介のページが入り、`?static` でアニメーションが止まり、`?print` で1ページ1枚の印刷表示（PDF 保存用）になります（`?present&print` のように組み合わせられます）。
 
 ## 守ること
 
