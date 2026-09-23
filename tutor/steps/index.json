@@ -10,7 +10,7 @@
     {
       "id": "p2",
       "title": "第2幕 · 受注した案件を遂行する（概要ページの不具合の修正、コードレビュー）",
-      "minutes": 49
+      "minutes": 51
     }
   ],
   "steps": [
@@ -211,6 +211,10 @@
           "review"
         ],
         [
+          "noteSet",
+          "review_findings"
+        ],
+        [
           "treeClean",
           "client",
           "server"
@@ -220,7 +224,7 @@
     {
       "id": "10-wrap",
       "part": "p2",
-      "minutes": 5,
+      "minutes": 7,
       "title": "まとめ · 進捗レポート（次フェーズへの引き継ぎつき）",
       "where": "cli",
       "hint": "進捗レポートがブラウザで開きます。今日の成果、予定と実績、次フェーズへの引き継ぎがまとまっています。",

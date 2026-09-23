@@ -481,6 +481,12 @@
           break-inside: avoid;
         }
       }
+      /* Long sentences, paths and hashes must wrap inside their card or cell instead of widening the grid. */
+      .cards > .card { min-width: 0; }
+      .card p, .card h3, .card .check, td, .box p { overflow-wrap: anywhere; }
+      td code, .card code { word-break: break-all; }
+      .card .check { font-size: 13.5px; color: var(--ink2); line-height: 1.6; margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--line); }
+      .card .check .chip { margin-right: 8px; }
     </style>
   </head>
   <body>
@@ -698,7 +704,7 @@
         const cards = $("div", "cards");
         changes.forEach((c) => {
           const card = $("div", "card");
-          card.innerHTML = `<div class="meta">${c.area ? `<span class="chip c">${esc(c.area)}</span>` : ""}${c.commit ? `<span class="chip k">${esc(String(c.commit).slice(0, 7))}</span>` : ""}</div><h3>${esc(c.title || "")}</h3>${c.what ? `<p>${esc(c.what)}</p>` : ""}${c.check ? `<p class="meta"><span class="chip m">確認: ${esc(c.check)}</span></p>` : ""}`;
+          card.innerHTML = `<div class="meta">${c.area ? `<span class="chip c">${esc(c.area)}</span>` : ""}${c.commit ? `<span class="chip k">${esc(String(c.commit).slice(0, 7))}</span>` : ""}</div><h3>${esc(c.title || "")}</h3>${c.what ? `<p>${esc(c.what)}</p>` : ""}${c.check ? `<div class="check"><span class="chip m">確認</span>${esc(c.check)}</div>` : ""}`;
           cards.appendChild(card);
         });
         s.appendChild(cards);
@@ -706,24 +712,31 @@
           s.appendChild($("p", null, `合計: <code>${esc(D.git.stat)}</code>`));
       });
 
-      // 05 code review
+      // 05 code review: every finding, why it mattered, what the learner chose, and what the fix changed.
+      // Detailed form: review.findings [{ severity, title, where, problem, decision, reason, fix }];
+      // older story files with review.fixed / review.deferred (plain lists) still render.
       section("コードレビュー", (s) => {
         const r = S.review || {};
         if (r.note) s.appendChild($("p", null, esc(r.note)));
-        if ((r.fixed || []).length || (r.deferred || []).length) {
+        const f = r.findings || [];
+        if (f.length) {
+          const is = (x, re) => re.test(x.decision || "");
+          const fixed = f.filter((x) => is(x, /修正|fix/i)), later = f.filter((x) => is(x, /次|later|defer/i)), skip = f.filter((x) => !is(x, /修正|fix/i) && !is(x, /次|later|defer/i));
+          const stats = $("div", "stats");
+          stats.innerHTML = `<div class="stat d"><div class="v">${f.length}</div><div class="k">見つかった指摘</div></div><div class="stat m"><div class="v">${fixed.length}</div><div class="k">修正した${r.fixCommit ? `<br><span class="chip k">${esc(String(r.fixCommit).slice(0, 7))}</span>` : ""}</div></div><div class="stat s"><div class="v">${later.length}</div><div class="k">次フェーズに回した</div></div><div class="stat"><div class="v">${skip.length}</div><div class="k">見送った</div></div>`;
+          s.appendChild(stats);
+          const dc = (x) => (is(x, /修正|fix/i) ? "m" : is(x, /次|later|defer/i) ? "s" : "n");
+          const t = $("table");
+          t.innerHTML = `<thead><tr><th style="width:6%">重要度</th><th style="width:30%">指摘と場所</th><th>何が問題か</th><th style="width:28%">判断と対応</th></tr></thead><tbody>${f
+            .map((x) => `<tr><td style="font-size:18px">${esc(x.severity || "")}</td><td><b>${esc(x.title)}</b>${x.where ? `<br><code>${esc(x.where)}</code>` : ""}</td><td>${esc(x.problem || "")}</td><td><span class="chip ${dc(x)}">${esc(x.decision || "—")}</span>${x.reason ? ` ${esc(x.reason)}` : ""}${x.fix ? `<br><small>修正: ${esc(x.fix)}</small>` : ""}</td></tr>`)
+            .join("")}</tbody>`;
+          s.appendChild(t);
+        } else if ((r.fixed || []).length || (r.deferred || []).length) {
           const g = $("div", "pairs");
-          const b1 = $("div", "box m");
-          b1.innerHTML = `<div class="h">直した指摘</div>${(r.fixed || []).length ? list(r.fixed) : "<p>なし</p>"}`;
-          const b2 = $("div", "box");
-          b2.innerHTML = `<div class="h">次フェーズに回した指摘</div>${(r.deferred || []).length ? list(r.deferred) : "<p>なし</p>"}`;
-          g.appendChild(b1);
-          g.appendChild(b2);
-          s.appendChild(g);
-        } else if (notes.review) {
-          const b = $("div", "box m");
-          b.innerHTML = `<div class="h">レビューの記録</div><p>${esc(notes.review)}</p>`;
-          s.appendChild(b);
-        }
+          const b1 = $("div", "box m"); b1.innerHTML = `<div class="h">直した指摘</div>${(r.fixed || []).length ? list(r.fixed) : "<p>なし</p>"}`;
+          const b2 = $("div", "box"); b2.innerHTML = `<div class="h">次フェーズに回した指摘</div>${(r.deferred || []).length ? list(r.deferred) : "<p>なし</p>"}`;
+          g.appendChild(b1); g.appendChild(b2); s.appendChild(g);
+        } else if (notes.review) { const b = $("div", "box m"); b.innerHTML = `<div class="h">レビューの記録</div><p>${esc(notes.review)}</p>`; s.appendChild(b); }
       });
 
       // 06 decisions and corrections
@@ -747,13 +760,29 @@
       });
 
       // 07 next phase (the handover to the client)
+      // 07 next phase: the detailed handover of everything Part 2 did not cover, grouped by requirement.
+      // Each item: { req, title, status, evidence, action, priority (高/中/低), estimate, question? }.
+      // Older story files with only { title, detail } still render (detail goes into the status column).
       section("次フェーズへの引き継ぎ", (s) => {
         const np = S.nextPhase || [];
-        if (np.length) {
+        const h = S.handover || {};
+        if (h.note) s.appendChild($("p", null, esc(h.note)));
+        if (!np.length) { s.appendChild($("p", null, "記録はありません。")); return; }
+        const pr = (p) => (/高|high/i.test(p || "") ? "c" : /中|mid|medium/i.test(p || "") ? "s" : "n");
+        const count = (re) => np.filter((x) => re.test(x.priority || "")).length;
+        s.appendChild($("p", "muted", `未対応の課題 ${np.length} 件（優先度 高 ${count(/高|high/i)} · 中 ${count(/中|mid|medium/i)} · 低 ${count(/低|low/i)}）`));
+        const groups = [];
+        np.forEach((x) => { const g = x.req || "その他"; let e = groups.find((y) => y.g === g); if (!e) groups.push((e = { g, items: [] })); e.items.push(x); });
+        groups.forEach(({ g, items }) => {
+          s.appendChild($("h3", "sub", esc(g)));
           const t = $("table");
-          t.innerHTML = `<thead><tr><th>項目</th><th>内容</th></tr></thead><tbody>${np.map((x) => `<tr><td><b>${esc(x.title)}</b></td><td>${esc(x.detail)}</td></tr>`).join("")}</tbody>`;
+          t.innerHTML = `<thead><tr><th style="width:18%">課題</th><th>現状（確認した根拠）</th><th>推奨対応</th><th style="width:12%">優先度 · 目安</th></tr></thead><tbody>${items
+            .map((x) => `<tr><td><b>${esc(x.title)}</b></td><td>${esc(x.status || x.detail || "")}${x.evidence ? `<br><code>${esc(x.evidence)}</code>` : ""}</td><td>${esc(x.action || "")}${x.question ? `<br><span class="chip s">要確認</span> ${esc(x.question)}` : ""}</td><td>${x.priority ? `<span class="chip ${pr(x.priority)}">${esc(x.priority)}</span>` : ""}${x.estimate ? `<br><small>${esc(x.estimate)}</small>` : ""}</td></tr>`)
+            .join("")}</tbody>`;
           s.appendChild(t);
-        } else s.appendChild($("p", null, "記録はありません。"));
+        });
+        if (h.schedule) { const b = $("div", "box s"); b.innerHTML = `<div class="h">提案書のスケジュールとの対応</div><p>${esc(h.schedule)}</p>`; s.appendChild(b); }
+        if ((h.questions || []).length) { const b = $("div", "box c"); b.innerHTML = `<div class="h">クライアントに確認したいこと</div>${list(h.questions)}`; s.appendChild(b); }
       });
 
       // 08 features
