@@ -4,7 +4,7 @@
 
 | 幕    | 内容                                                                                       | 目安   |
 | ----- | ------------------------------------------------------------------------------------------ | ------ |
-| 第1幕 | RFP を読み解き、提案の方針を決めて、Claude に提案書と HTML ページ・スライドを作らせる | 約30分 |
+| 第1幕 | RFP を読み解き、提案の方針を決めて、Claude に提案書と HTML ページ・スライドを作らせる | 約34分 |
 | 第2幕 | 受注後、アプリを起動し、クライアントから報告された概要ページの不具合（期間や場所を選んでも反映されない）を直し、サブエージェントでコードレビューしてコミットする | 約51分 |
 
 ## 事前準備
@@ -14,6 +14,7 @@
 - **Claude Code**: [docs.claude.com/claude-code](https://docs.claude.com/en/docs/claude-code/overview)
 - **Node.js 18 以上**: [nodejs.org](https://nodejs.org)
 - **uv**（Python パッケージマネージャー）: `curl -LsSf https://astral.sh/uv/install.sh | sh`
+- **Python 3.11 以上**（第2幕でバックエンドが使います）
 - **git**
 
 ## 始め方
@@ -26,9 +27,13 @@ cd meridian-workshop-jp
 ./start.sh          # Windows は start.cmd
 ```
 
-Claude が起動したら「こんにちは」と一声かけてください。あとは Claude が一歩ずつ案内します。最初に、ブラウザで **「いまどこ？」ページ**（http://localhost:8766/map.html）が開きます。現在のステップ、経過時間と90分の予算、全体マップが自動で更新されるので、開いたままにしておいてください。
+Claude が起動したら「こんにちは」と一声かけてください。あとは Claude が一歩ずつ案内します。最初に、ブラウザで **「いまどこ？」ページ**（http://localhost:8766/map.html）が開きます。現在のステップ、経過時間と90分の予算、全体マップが自動で更新されるので、開いたままにしておいてください。続いて **紹介スライド**（http://localhost:8766/intro/deck.html）で、進め方と今日の流れを4分ほどで確認します。
 
 `./start.sh` は Claude Code に tutor プラグインを `--plugin-dir` で渡すだけで、何もインストールしません。
+
+## 講師の方へ
+
+紹介スライドは、会場で映して説明するのにも使えます。`node tutor/bin/tutor.mjs serve` でページサーバーだけを起動し、http://localhost:8766/intro/deck.html を開いてください（`tutor/pages/intro/deck.html` をブラウザで直接開いても動きます）。タイトルの次に講師紹介のページが入ります（`?nospeaker` を付けると出ません）。← → で移動、Esc でページ一覧（クリックで好きなページへ）、N で講師用ノート、F で全画面です。講師紹介の内容は `tutor/pages/intro/presenter.js` を書き換えるだけで差し替えられます。スライド自体の直し方は `tutor/maint/intro-deck/README.md` にあります。
 
 ## 途中で接続が切れてしまったら
 
@@ -47,6 +52,6 @@ Claude が起動したら「こんにちは」と一声かけてください。�
 - `docs/rfp/`: RFP とクライアントの背景資料
 - `proposal/`: 提案書の置き場所（最初は空です）
 - `client/`、`server/`: 第2幕で手を入れるアプリケーション本体
-- `tutor/`: ワークショップのチューター（Claude Code プラグイン。ステップの台本、解説ページ、「いまどこ？」ページ）
+- `tutor/`: ワークショップのチューター（Claude Code プラグイン。ステップの台本、紹介スライド、解説ページ、「いまどこ？」ページ）
 - `.claude/`: このワークショップ用に用意した、プロジェクトレベルの Claude Code 設定（`/start` コマンド、code-reviewer サブエージェントなど）
 - `instruction/`: 講師用資料

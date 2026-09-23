@@ -5,7 +5,7 @@
     {
       "id": "p1",
       "title": "第1幕 · RFP に応札する（提案書づくり）",
-      "minutes": 30
+      "minutes": 34
     },
     {
       "id": "p2",
@@ -32,7 +32,17 @@
       ]
     },
     {
-      "id": "01-page-rfp",
+      "id": "01-intro-deck",
+      "part": "p1",
+      "minutes": 4,
+      "title": "読む: このワークショップの進め方 · 紹介スライド",
+      "where": "browser",
+      "page": "intro/deck.html",
+      "hint": "紹介スライドです。→ キーか右下のボタンで進めます。Esc キーでページの一覧が出ます。読み終えたら、ターミナルに戻って「Done」（または「読みました」「Next Step」）と送ってください。",
+      "checks": []
+    },
+    {
+      "id": "02-page-rfp",
       "part": "p1",
       "minutes": 4,
       "title": "読む: RFP とは · 一般的な流れと、応札側が考えること",
@@ -42,7 +52,7 @@
       "checks": []
     },
     {
-      "id": "02-kickoff",
+      "id": "03-kickoff",
       "part": "p1",
       "minutes": 4,
       "title": "RFP を読む · @ で読み込み、私たちの理解を整理する",
@@ -57,7 +67,7 @@
       "page": "02-rfp-meridian.html"
     },
     {
-      "id": "03-analyze",
+      "id": "04-analyze",
       "part": "p1",
       "minutes": 6,
       "title": "穴を探す · 決めないと見積もれない点と、引き継ぎメモ",
@@ -71,7 +81,7 @@
       ]
     },
     {
-      "id": "04-proposal",
+      "id": "05-proposal",
       "part": "p1",
       "minutes": 8,
       "title": "提案の方針を決める · 提案書は Claude が一気に書く",
@@ -89,7 +99,7 @@
       ]
     },
     {
-      "id": "05-deck",
+      "id": "06-deck",
       "part": "p1",
       "minutes": 5,
       "title": "HTML ページとスライドにする · 提案書を見せる形に",
@@ -107,7 +117,7 @@
       ]
     },
     {
-      "id": "06-env",
+      "id": "07-env",
       "part": "p2",
       "minutes": 6,
       "title": "受注 · 環境を確認し、/start でアプリを起動",
@@ -134,7 +144,7 @@
       ]
     },
     {
-      "id": "07-plan-r1",
+      "id": "08-plan-r1",
       "part": "p2",
       "minutes": 6,
       "title": "R1 の原因を調べて計画する · 概要ページで期間や場所を選んでも反映されない",
@@ -156,7 +166,7 @@
       ]
     },
     {
-      "id": "08-build-r1",
+      "id": "09-build-r1",
       "part": "p2",
       "minutes": 22,
       "title": "R1 を直す · 概要ページの KPI をフィルターに連動させる",
@@ -199,7 +209,7 @@
       ]
     },
     {
-      "id": "09-review",
+      "id": "10-review",
       "part": "p2",
       "minutes": 10,
       "title": "コードレビュー · サブエージェントの指摘を選んで直す",
@@ -222,7 +232,7 @@
       ]
     },
     {
-      "id": "10-wrap",
+      "id": "11-wrap",
       "part": "p2",
       "minutes": 7,
       "title": "まとめ · 進捗レポート（次フェーズへの引き継ぎつき）",
