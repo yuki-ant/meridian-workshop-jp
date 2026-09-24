@@ -8,7 +8,7 @@ YOU DO
    - 0件のとき（例: 絞り込みで注文がない月）は、NaN や Infinity ではなく 0 や「—」を出す。
    - 参加者にブラウザで確かめてもらう: 期間（例: 3月）や場所（例: 東京）を切り替えて、3つの KPI が変わるか。在庫回転率が「—」になっているか。全件に戻すと元の値の近くに戻るか。あなたが「動きました」と言い切らない。
    - コミットしてよいか聞いてからコミットする。例: `概要: KPI をフィルター済みのデータから計算し、期間・場所の選択を反映`
-2. **（任意・時間が余ったら）Reports ページ。** 同じ症状がある。`server/main.py` の `/api/reports/quarterly` と `/api/reports/monthly-trends` にフィルターのパラメータを足し（既存の `apply_filters` と `filter_by_month` を再利用、変更後はバックエンドを `fuser -k 8001/tcp` で止めて `cd server && uv run python main.py` をバックグラウンドで起動し直す）、`client/src/api.js` に登録し、`Reports.vue` を `useFilters` と `watch` でつなぐ。テストは `cd tests && uv run --project ../server pytest -q`（元から2件失敗）。確かめてから別のコミットにする。
+2. **（任意・時間が余ったら）Reports ページ。** 同じ症状がある。`server/main.py` の `/api/reports/quarterly` と `/api/reports/monthly-trends` にフィルターのパラメータを足し（既存の `apply_filters` と `filter_by_month` を再利用、変更後はバックエンドを `./scripts/ports.sh free 8001` で止めて `cd server && uv run python main.py` をバックグラウンドで起動し直す）、`client/src/api.js` に登録し、`Reports.vue` を `useFilters` と `watch` でつなぐ。テストは `cd tests && uv run --project ../server pytest -q`（元から2件失敗）。確かめてから別のコミットにする。
 3. proposal/ の下書きは、参加者が望まない限りコミットに含めない。
 
 時間切れの場合: 動いているところまでをコミットし、残りを最後のレポートの「次フェーズ」に書く。

@@ -2,6 +2,7 @@
 
 # 工場在庫管理システム - 停止スクリプト
 # バックエンドとフロントエンドの両サーバーを停止します
+# Linux / macOS / Windows の Git Bash で動きます
 
 set -e  # エラー時に終了
 
@@ -33,19 +34,9 @@ if [ -f /tmp/inventory-frontend.pid ]; then
 fi
 
 # フォールバック: ポート上に残っているプロセスを停止
+# (Git Bash では上の kill がラッパーにしか届かないので、実際の python / node はここで止まる)
 echo -e "${YELLOW}残っているプロセスをクリーンアップしています...${NC}"
-
-# ポート 8001(バックエンド)のプロセスを停止
-BACKEND_PIDS=$(lsof -ti:8001 2>/dev/null || true)
-if [ ! -z "$BACKEND_PIDS" ]; then
-    echo "$BACKEND_PIDS" | xargs kill 2>/dev/null || true
-fi
-
-# ポート 3000(フロントエンド)のプロセスを停止
-FRONTEND_PIDS=$(lsof -ti:3000 2>/dev/null || true)
-if [ ! -z "$FRONTEND_PIDS" ]; then
-    echo "$FRONTEND_PIDS" | xargs kill 2>/dev/null || true
-fi
+"$(dirname "$0")/ports.sh" free 8001 3000 || true
 
 # ログファイルを削除
 rm -f /tmp/inventory-backend.log

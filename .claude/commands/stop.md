@@ -4,5 +4,4 @@ description: フロントエンドとバックエンドのサーバーを停止�
 
 ポート 3000(フロントエンド)と 8001(バックエンド)で動いているプロセスを見つけて停止してください。
 
-- macOS/Linux: `lsof -ti:3000,8001 | xargs kill 2>/dev/null || true`
-- Windows: `netstat -aon | findstr :PORT` で PID を調べてから `taskkill /F /PID <pid>`
+`./scripts/ports.sh free 3000 8001`（Linux / macOS / Windows の Git Bash 共通。ポート番号で止めるので、コマンド名で止めないこと）

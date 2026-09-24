@@ -801,20 +801,30 @@ function cmdlineOf(pid) {
     : spawnSync("ps", ["-p", String(pid), "-o", "args="], { encoding: "utf8" })
         .stdout;
 }
+// PIDs listening on a TCP port (IPv4 or IPv6). The state column is localized, so a listener is a TCP row whose foreign address ends in :0.
+function winListenPids(port) {
+  const out =
+    spawnSync("netstat", ["-ano"], { encoding: "utf8", windowsHide: true })
+      .stdout || "";
+  const pids = new Set();
+  for (const l of out.split(/\r?\n/)) {
+    const [proto, local, foreign, , pid] = l.trim().split(/\s+/);
+    if (
+      proto === "TCP" &&
+      local?.endsWith(`:${port}`) &&
+      foreign?.endsWith(":0") &&
+      /^[1-9]\d*$/.test(pid || "")
+    )
+      pids.add(pid);
+  }
+  return [...pids];
+}
 function killStaleTutorServer(port) {
   try {
     if (WIN) {
-      const line = spawnSync(
-        "cmd",
-        ["/c", `netstat -ano -p tcp | findstr LISTENING | findstr :${port}`],
-        { encoding: "utf8", windowsHide: true },
-      )
-        .stdout.split(/\r?\n/)
-        .find((l) => new RegExp(`[:.]${port}\\s`).test(l));
-      const pid = line && line.trim().split(/\s+/).pop();
-      if (!pid || !/^\d+$/.test(pid)) return;
-      if (isTutorCmd(cmdlineOf(pid)))
-        spawnSync("taskkill", ["/PID", pid, "/F"], { windowsHide: true });
+      for (const pid of winListenPids(port))
+        if (isTutorCmd(cmdlineOf(pid)))
+          spawnSync("taskkill", ["/PID", pid, "/F"], { windowsHide: true });
     } else {
       for (const pid of (
         spawnSync("lsof", [`-ti:${port}`, "-sTCP:LISTEN"], { encoding: "utf8" })
@@ -1194,17 +1204,24 @@ switch (cmd) {
         : "ページサーバーは動いていませんでした",
     ];
     const stop = path.join(ROOT, "scripts", "stop.sh");
-    if (!WIN && fs.existsSync(stop)) {
+    if (WIN) {
+      // `bash` on a Windows PATH may be WSL's, so free the ports here instead of running stop.sh
+      const pids = [3000, 8001].flatMap(winListenPids);
+      for (const pid of pids)
+        spawnSync("taskkill", ["/PID", pid, "/T", "/F"], { windowsHide: true });
+      out.push(
+        pids.length
+          ? "アプリ（3000 / 8001）を停止しました"
+          : "アプリ（3000 / 8001）は動いていませんでした",
+      );
+    } else if (fs.existsSync(stop)) {
       const r = sh("bash", [stop]);
       out.push(
         r.code === 0
           ? "アプリ（3000 / 8001）を停止しました（scripts/stop.sh）"
           : `scripts/stop.sh が終了コード ${r.code} で終わりました`,
       );
-    } else
-      out.push(
-        "アプリ: Windows では、起動したウィンドウで Ctrl+C を押して止めてください",
-      );
+    }
     log("stop-all");
     console.log(out.join("\n"));
     break;
