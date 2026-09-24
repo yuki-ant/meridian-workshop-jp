@@ -2,6 +2,7 @@
 
 # 工場在庫管理システム - 起動スクリプト
 # バックエンド(FastAPI)とフロントエンド(Vue + Vite)の両サーバーを起動します
+# Linux / macOS / Windows の Git Bash で動きます
 
 set -e  # エラー時に終了
 
@@ -35,7 +36,7 @@ fi
 # バックエンドサーバーをバックグラウンドで起動
 echo -e "${GREEN}バックエンドサーバーを起動しています: http://localhost:8001${NC}"
 cd "$PROJECT_ROOT/server"
-uv run python3 main.py > /tmp/inventory-backend.log 2>&1 &
+uv run python main.py > /tmp/inventory-backend.log 2>&1 &
 BACKEND_PID=$!
 
 # バックエンドの起動を少し待つ
@@ -57,15 +58,22 @@ echo -e "${BLUE}API ドキュメント:${NC} http://localhost:8001/docs"
 echo -e "\n${YELLOW}ログ:${NC}"
 echo -e "  バックエンド: /tmp/inventory-backend.log"
 echo -e "  フロントエンド: /tmp/inventory-frontend.log"
-echo -e "\n${YELLOW}サーバーを停止するには次を実行してください:${NC} ./stop.sh"
-echo -e "${YELLOW}または Ctrl+C のあと、次を実行してください:${NC} kill $BACKEND_PID $FRONTEND_PID"
+echo -e "\n${YELLOW}サーバーを停止するには次を実行してください:${NC} ./scripts/stop.sh"
 
 # 停止スクリプト用に PID をファイルへ保存
 echo "$BACKEND_PID" > /tmp/inventory-backend.pid
 echo "$FRONTEND_PID" > /tmp/inventory-frontend.pid
 
 # Ctrl+C を待機
-trap "echo -e '\n${YELLOW}サーバーをシャットダウンしています...${NC}'; kill $BACKEND_PID $FRONTEND_PID 2>/dev/null; rm -f /tmp/inventory-*.pid; exit 0" INT TERM
+# Git Bash では $! が uv / npm のラッパーを指し、kill しても python / node が残るので、ポートでも止める
+shutdown() {
+    echo -e "\n${YELLOW}サーバーをシャットダウンしています...${NC}"
+    kill $BACKEND_PID $FRONTEND_PID 2>/dev/null
+    "$SCRIPT_DIR/ports.sh" free 8001 3000 >/dev/null
+    rm -f /tmp/inventory-*.pid
+    exit 0
+}
+trap shutdown INT TERM
 
 echo -e "\n${GREEN}すべてのサーバーを停止するには Ctrl+C を押してください${NC}"
 wait

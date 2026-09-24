@@ -8,8 +8,7 @@ description: フロントエンドとバックエンドのサーバーを起動�
 **フロントエンド:** `cd client && npm run dev`
 
 ポートを使用中のプロセスを停止する方法:
-- macOS/Linux: `lsof -ti:3000,8001 | xargs kill -9 2>/dev/null || true`
-- Windows: `netstat -aon | findstr :PORT` で PID を調べてから `taskkill /F /PID <pid>`
+`./scripts/ports.sh free 3000 8001`（Linux / macOS / Windows の Git Bash 共通。ポート番号で止めるので、コマンド名で止めないこと）
 
 起動後、次の URL で動作を確認してください:
 - バックエンド: http://localhost:8001/docs

@@ -17,7 +17,8 @@
 ## 作業上の注意
 
 - アプリの起動は `/start`（参加者が入力する）、または `./scripts/start.sh`。停止は `/stop` または `./scripts/stop.sh`。
-- ポートを空けるときはポート指定で止める: `fuser -k 3000/tcp`、`fuser -k 8001/tcp`。`pkill -f vite` のようにコマンド名で止めると、実行中のシェルごと落とすことがあるので使わない。`lsof` がない環境もあるので、確認には `ss -ltn` を使う。
+- 参加者の環境は Linux / macOS / Windows の Git Bash のどれか。`fuser`・`ss`・`lsof` は Git Bash にないので、ポートの確認と解放は共通のスクリプトを使う: 確認は `./scripts/ports.sh`、解放は `./scripts/ports.sh free 3000 8001`（ポート指定で止める）。`pkill -f vite` のようにコマンド名で止めると、実行中のシェルごと落とすことがあるので使わない。
+- Python は `uv run python …` で呼ぶ（Windows の仮想環境には `python3` がない）。
 - リモート環境で手元のブラウザから開く場合、公開が必要なのはポート 3000 だけ（8001 は Vite のプロキシ経由）。
 - `docs/rfp/vendor-handoff.md` は一次資料として扱いつつ、必ず実際のコードと突き合わせる。不完全だったり古かったりする。
 - 生成する HTML の日本語フォントには Noto Sans JP を使う（Anthropic Sans は日本語グリフに対応していない）。
